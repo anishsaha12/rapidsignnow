@@ -1,0 +1,164 @@
+{% extends 'system_admin/base.html' %} {% load staticfiles %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'theme/js/data-tables/DT_bootstrap.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" /> {% endblock theme_styles %} {% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}"> {% endblock other_styles %} {% load range_filter %} {% block content %}
+<style>
+    /* .adv-table {
+        margin-top: -64px;
+    }
+
+    #paginator {
+    background-color: gainsboro;
+    border-radius: 3px;
+    outline: none;
+    border: transparent;
+    padding: 5px 10px;
+
+    }
+
+    .current {
+        margin-right: 7px;
+    } */
+    @media only screen and (max-width: 500px) {
+
+#cases-table{
+    overflow-y:scroll;
+   display:block;
+    }
+}
+</style>
+
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading no-mouse-events">
+                Master Brokers
+            </header>
+            <div class="panel-body">
+                <button type="button" class="btn btn-primary" id="add-master-broker"><i class="fa fa-plus"></i> Add Master Broker</button>
+                <div class="panel-body">
+                        <!-- <div class="pagination">
+                            <span class="step-links">
+                                        {% if master_brokers.has_previous %}
+                                           <button id="paginator" onclick="window.location.href='?page={{ master_brokers.previous_page_number }}'"><i class="fa fa-chevron-left" style="color:black" aria-hidden="true"></i></button>
+                                        {% endif %}
+                                
+                                        <span class="current">
+                                             {{ master_brokers.number }} of {{ master_brokers.paginator.num_pages }}
+                                        </span> 
+                                        {% if master_brokers.has_next %}
+                            <button id="paginator" onclick="window.location.href='?page={{ master_brokers.next_page_number }}'"><i class="fa fa-chevron-right" style="color:black" aria-hidden="true"></i></button>                    
+                            {% endif %}
+                            </span>
+                        </div> -->
+                <div class="adv-table editable-table ">
+                    <div class="clearfix">
+                    </div>
+                    <div class="space15"></div>
+                    <table class="table table-striped table-hover table-bordered" id="cases-table">
+                        <thead>
+                            <tr>
+                                <th>Name of Master Broker</th>
+                                <th>Email Address</th>
+                                <th>Phone number</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for master_broker in master_brokers %}
+                            <tr>
+                                <td data-master-broker-id="{{ master_broker.pk }}" class="view-master-broker clickable">{{ master_broker.user.first_name }} {{ master_broker.user.last_name }}</td>
+                                <td>{{ master_broker.email_one }}</td>
+                                <td>{{ master_broker.phone_number_one }}</td>
+                                <td class="table-dropdown-holder">
+                                    <span class="text">{{ master_broker.address }}</span> 
+                                    {% if master_broker.address.gmaps_link %}
+                                    <span class="options"><a href="{{ master_broker.address.gmaps_link | safe }}" target="_blank"><i class="fa fa-map-marker"></i></a></span>
+                                    {% else %}
+                                    <span class="options">
+                                        <i class="fa fa-map-marker"></i>
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>{% if master_broker.is_active %}Active{% else %}Suspended {% endif %}</td>
+                                <td>{{ master_broker.rating }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery-1.10.2.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery-migrate.js' %}"></script>
+
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script class="include" type="text/javascript" src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/data-tables/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/js/data-tables/DT_bootstrap.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+
+<!--script for this page only-->
+<script src="{% static 'theme/js/table-editable.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script>
+    $(function () {
+        EditableTable.init();
+    });
+</script>
+
+<!-- END JAVASCRIPTS -->
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+    $('a[data-nav-item=master_brokers]').addClass('active');
+    $('#navigation-button').remove();
+    $('#add-master-broker').click(function() {
+        location.assign('/administrator/new-master-broker/');
+    });
+    $('.view-master-broker').click(function () {
+        location.assign('/administrator/master-broker/' + $(this).attr('data-master-broker-id') + '/');
+    });
+    
+    if(getParameterByName('created') === 'True') {
+        history.pushState({}, '', location.href.substring(0, location.href.indexOf('?')));
+        swal({
+            title: 'Master Broker Added',
+            text: 'The master broker has been added to the system',
+            type: 'success',
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+
+</script>
+{% endblock other_scripts %}

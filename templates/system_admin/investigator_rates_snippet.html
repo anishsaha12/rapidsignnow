@@ -1,0 +1,115 @@
+{% if investigator_rates %}
+    <div class="panel-body">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment for 1 signature</label>
+                <input type="number" min="0" name="default-in-area-payment-for-one-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_in_area_payment_for_one_signature }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Maximum in-area payment for any number of signatures</label>
+                <input type="number" min="0" name="maximum-in-area-payment-for-any-number-of-signatures-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.maximum_in_area_payment_for_any_number_of_signatures }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment for each additional adult signature</label>
+                <input type="number" min="0" name="default-out-of-area-payment-for-each-additional-adult-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_out_of_area_payment_for_each_additional_adult_signature }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment when signature not obtained</label>
+                <input type="number" min="0" name="default-out-of-area-payment-when-signature-not-obtained-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_out_of_area_payment_when_signature_not_obtained }}">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment for each additional adult signature</label>
+                <input type="number" min="0" name="default-in-area-payment-for-each-additional-adult-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_in_area_payment_for_each_additional_adult_signature }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment when signature not obtained</label>
+                <input type="number" min="0" name="default-in-area-payment-when-signature-not-obtained-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_in_area_payment_when_signature_not_obtained }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment for children</label>
+                <input type="number" min="0" name="default-out-of-area-payment-for-children-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_out_of_area_payment_for_children }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Mileage threshold</label>
+                <input type="number" min="0" name="mileage-threshold-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.mileage_threshold }}">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment for children</label>
+                <input type="number" min="0" name="default-in-area-payment-for-children-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_in_area_payment_for_children }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment for 1 signature</label>
+                <input type="number" min="0" name="default-out-of-area-payment-for-one-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.default_out_of_area_payment_for_one_signature }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Maximum out-of-area payment for any number of signatures</label>
+                <input type="number" min="0" name="maximum-out-of-area-payment-for-any-number-of-signatures-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.maximum_out_of_area_payment_for_any_number_of_signatures }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Mileage compensation rate</label>
+                <input type="number" min="0" name="mileage-compensation-rate-investigator" class="form-control" placeholder="Enter rate" value="{{ investigator_rates.mileage_compensation_rate }}">
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="panel-body">
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment for 1 signature</label>
+                <input type="number" min="0" name="default-in-area-payment-for-one-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_IN_AREA_PAYMENT_FOR_ONE_SIGNATURE_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Maximum in-area payment for any number of signatures</label>
+                <input type="number" min="0" name="maximum-in-area-payment-for-any-number-of-signatures-investigator" class="form-control" placeholder="Enter rate" value="{{ config.MAXIMUM_IN_AREA_PAYMENT_FOR_ANY_NUMBER_OF_SIGNATURES_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment for each additional adult signature</label>
+                <input type="number" min="0" name="default-out-of-area-payment-for-each-additional-adult-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_OUT_OF_AREA_PAYMENT_FOR_EACH_ADDITIONAL_ADULT_SIGNATURE_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment when signature not obtained</label>
+                <input type="number" min="0" name="default-out-of-area-payment-when-signature-not-obtained-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_OUT_OF_AREA_PAYMENT_WHEN_SIGNATURE_NOT_OBTAINED_INVESTIGATOR }}">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment for each additional adult signature</label>
+                <input type="number" min="0" name="default-in-area-payment-for-each-additional-adult-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_IN_AREA_PAYMENT_FOR_EACH_ADDITIONAL_ADULT_SIGNATURE_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment when signature not obtained</label>
+                <input type="number" min="0" name="default-in-area-payment-when-signature-not-obtained-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_IN_AREA_PAYMENT_WHEN_SIGNATURE_NOT_OBTAINED_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment for children</label>
+                <input type="number" min="0" name="default-out-of-area-payment-for-children-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_OUT_OF_AREA_PAYMENT_FOR_CHILDREN_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Mileage threshold</label>
+                <input type="number" min="0" name="mileage-threshold-investigator" class="form-control" placeholder="Enter rate" value="{{ config.MILEAGE_THRESHOLD_INVESTIGATOR }}">
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default in-area payment for children</label>
+                <input type="number" min="0" name="default-in-area-payment-for-children-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_IN_AREA_PAYMENT_FOR_CHILDREN_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Default out-of-area payment for 1 signature</label>
+                <input type="number" min="0" name="default-out-of-area-payment-for-one-signature-investigator" class="form-control" placeholder="Enter rate" value="{{ config.DEFAULT_OUT_OF_AREA_PAYMENT_FOR_ONE_SIGNATURE_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Maximum out-of-area payment for any number of signatures</label>
+                <input type="number" min="0" name="maximum-out-of-area-payment-for-any-number-of-signatures-investigator" class="form-control" placeholder="Enter rate" value="{{ config.MAXIMUM_OUT_OF_AREA_PAYMENT_FOR_ANY_NUMBER_OF_SIGNATURES_INVESTIGATOR }}">
+            </div>
+            <div class="form-group">
+                <label class="rate-label" for="exampleInputEmail1">Mileage compensation rate</label>
+                <input type="number" min="0" name="mileage-compensation-rate-investigator" class="form-control" placeholder="Enter rate" value="{{ config.MILEAGE_COMPENSATION_RATE_INVESTIGATOR }}">
+            </div>
+        </div>
+    </div>
+{% endif %}

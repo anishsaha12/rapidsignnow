@@ -1,0 +1,191 @@
+{% extends 'investigator/base.html' %}
+
+{% load staticfiles %}
+
+{% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet">   
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet" >
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+<style>
+    .law-firm-select, .country-select-dropdown {
+        padding: 0;
+    }
+    
+    .law-firm-select > .select2-choice, .country-select-dropdown > .select2-choice {
+        height: 100%;
+    }
+</style>
+{% endblock theme_styles %}
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'investigator/css/style.css' %}">
+{% endblock other_styles %}
+
+{% load range_filter %}
+
+{% block content %}
+
+<div class="tab-target show" data-target-value="case-details">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Case Details
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <form action="." method="post" class="form-horizontal bucket-form">
+                        {% csrf_token %}
+                        {% include 'investigator/case_form_snippet_investigator.html' %}
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12">
+        </div>
+    </div>
+</div>
+
+<div class="tab-target show" data-target-value="timeline">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="timeline">
+                <article class="timeline-item alt">
+                    <div class="text-right">
+                        <div class="time-show first">
+                            <a class="btn btn-primary">Today</a>
+                        </div>
+                    </div>
+                </article>
+                {% for status_change in status_updates %}
+                <article class="timeline-item {% if forloop.counter|divisibleby:2 %}alt{% endif %}">
+                    <div class="timeline-desk">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <span class="arrow-alt"></span>
+
+                                <span class="timeline-icon red">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                                <span class="timeline-date"></span>
+                                <h1 class="red">
+                                    {{ status_change.timestamp |date:"D d F Y  h:i A" }}
+                                </h1>
+                                <p>{{ status_change.status }} {% if status_change.extra_info %} <i class="fa fa-info-circle extra-info-holder" data-stringified-info="{{ status_change.extra_info }}"></i> {% endif %} ({{ status_change.user.first_name }} {{ status_change.user.last_name }})</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+
+{% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %}
+
+{% block other_scripts %}
+<script src="{% static 'investigator/js/details.js' %}"></script>
+<script>
+    var case_id = {{ case.pk }}, case_status = '{{ case.status }}', law_firm_id = {{ case.law_firm.pk }};
+    
+    $('#adult-clients').tagsInput({
+        width:'auto',
+        defaultText: 'Add client'
+    });
+    $('#child-clients').tagsInput({
+        width:'auto',
+        defaultText: 'Add client'
+    });
+
+    // $('#country-select').select2({
+    //         width: '100%'
+    //     });
+    
+    $('input[name=dol]').datepicker();
+    $('input[name=dol]').datepicker('setDate', '{{ case.dol | date:"m/d/o" }}');
+    
+    $('#adult-clients').importTags('{{ case.adult_clients }}');
+    $('#child-clients').importTags('{{ case.child_clients }}');
+    
+    $('select[name="law-firm"]').val(law_firm_id);
+    $('select[name="country"]').val('{{ case.client_address.country }}');
+    $('select[name="locality"]').val('{{ case.locality }}');
+    $('#navigation-button').html('<i class="fa fa-chevron-left"></i> Back');
+    $('#navigation-button').click(function () {
+        location.assign('/investigator/closed-cases/');
+    });
+    $('input:not(.swal2-input), textarea:not(.swal2-input)').attr('readonly', 'readonly');
+    $('select').attr('disabled', 'disabled');
+</script>
+{% endblock other_scripts %}

@@ -1,0 +1,349 @@
+{% extends 'system_admin/base.html' %} {% load staticfiles %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" /> {% endblock theme_styles %} 
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<style>
+    .language-select, .country-select-dropdown {
+        padding: 0;
+    }
+    
+    .language-select > .select2-choice, .country-select-dropdown > .select2-choice {
+        height: 100%;
+    }
+</style>
+{% endblock other_styles %} 
+
+{% load range_filter %} 
+
+{% block content %}
+
+<form action="." method="post" class="form-horizontal bucket-form" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Add Investigator
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <div class="col-lg-6">
+                                    <div class="input-group m-bot15" style="width: 100%;">
+                                        <input readonly type="text" class="form-control" value="Username: Same as email ID" style="border: 1px solid rgb(226, 226, 228);">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group m-bot15" style="width: 100%;">
+                                        <input required type="password" name="password" class="form-control" placeholder="Password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">First Name <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="first-name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Last Name <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="last-name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Nickname</div>
+                        <div class="col-lg-6">
+                            <input type="text" name="nickname" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Languages <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <select name="languages" required id="" class="form-control mbot-15 language-select" multiple>
+                                {% for language in languages %}
+                                <option value="{{ language }}">{{ language }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 1 <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="phone-1" type="text" min="0" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 2</div>
+                        <div class="col-lg-6">
+                            <input name="phone-2" type="text" min="0" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 1 <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="email-1" type="email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 2</div>
+                        <div class="col-lg-6">
+                            <input name="email-2" type="email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1 <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="street-1" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2 </div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="street-2" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="city" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State/Province/Region <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="state" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Country <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <select name="country" required id="" class="form-control mbot-15 country-select-dropdown">
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="zip-code" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1 (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-street-1" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2 (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-street-2" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-city" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State/Province/Region (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-state" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Country (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <select name="secondary-country" id="" class="form-control mbot-15 country-select-dropdown">
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-zip-code" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Certification</div>
+                        <div class="col-lg-6">
+                            <select name="certification" id="" class="form-control mbot-15">
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">More info</div>
+                        <div class="col-lg-6">
+                            <textarea class="form-control" name="more-info" rows="6"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label for="exampleInputFile">Photograph</label>
+                                        <input type="file" id="exampleInputFile" name="photograph" accept="image/*">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Rates
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                {% include 'system_admin/investigator_rates_snippet.html' %}
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-buttons editing">
+                <button type="submit" class="btn btn-info">Create</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+<script src="{% static 'common/js/jquery.inputmask.bundle.min.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+    $('a[data-nav-item=investigators]').addClass('active');
+    $('#navigation-button').html('<i class="fa fa-chevron-left"></i> Back');
+    $('#navigation-button').click(function () {
+        location.assign('/administrator/investigators/');
+    });
+    
+    $.validator.addMethod('phone', function (value) {
+        if (value == '') {
+            return true;
+        }
+        
+        return /^\+\d \d\d\d\-\d\d\d\-\d\d\d\d$/.test(value); 
+    }, 'Please enter a valid phone number.');
+    
+    $('form').validate({
+        rules: {
+            'email-1': {
+                remote: {
+                    url: '/check-username/'
+                }
+            },
+            'phone-1': {
+                phone: true
+            },
+            'phone-2': {
+                phone: true
+            }
+        },
+        messages: {
+            'email-1': {
+                remote: 'A user with this email already exists'
+            }
+        }
+    });
+    
+    $('input[name*=phone]').inputmask('+9 999-999-9999');
+    
+    {% if error %}
+        var error = '{{ error }}';
+
+        swal('Error while creating broker', error, 'error');
+    {% endif %}
+         
+    $('.language-select').select2({
+        width: '100%'
+    });
+         
+    $('.country-select-dropdown').select2({
+        width: '100%'
+    });
+
+</script>
+{% endblock other_scripts %}

@@ -1,0 +1,124 @@
+{% extends 'investigator/base.html' %}
+
+{% load staticfiles %}
+
+{% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'theme/js/data-tables/DT_bootstrap.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+{% endblock theme_styles %}
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'investigator/css/style.css' %}">
+<style>
+    #back-button {
+        display: none;
+    }
+    .panel-body{
+        display: none;
+    }
+</style>
+{% endblock other_styles %}
+
+{% load range_filter %}
+
+{% block content %}
+
+<div id="closed-cases">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="row">
+                {% for case in closed_cases %}
+                <div class="col-md-4">
+                    <section class="panel case-card">
+                        <header class="panel-heading">
+                            {{ case.name }}
+                            <span class="tools pull-right">
+                                <a href="javascript:;" class="fa fa-chevron-up"></a>
+                             </span>
+                        </header>
+                        <div class="panel-body">
+                            <div class="panel-central-heading">Status: {{ case.status }}</div>
+                            <p class="client-info">{{ case.client_name }} <br> 
+                            {{ case.client_phone_number }} <br>
+                            {% if case.client_address.gmaps_link %}
+                            <span class="options"><a class="directions" href="{{ case.client_address.gmaps_link | safe }}" target="_blank">Directions</a></span>
+                            {% endif %}
+                            <div class="working-case-buttons">
+                                <button type="button" data-case-id="{{ case.pk }}" class="btn btn-primary btn-lg btn-block see-details">See details</button>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock content %}
+
+
+{% block theme_scripts %}
+<script src="{% static 'theme/js/jquery-1.10.2.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery-migrate.js' %}"></script>
+
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script class="include" type="text/javascript" src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/data-tables/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/js/data-tables/DT_bootstrap.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+
+<!--script for this page only-->
+<script src="{% static 'theme/js/table-editable.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+
+<!-- END JAVASCRIPTS -->
+<script>
+    jQuery(document).ready(function() {
+        EditableTable.init();
+    });
+</script>
+{% endblock theme_scripts %}
+
+{% block other_scripts %}
+<script src="{% static 'investigator/js/script.js' %}"></script>
+<script>
+    $('a[data-nav-item=closed-cases]').addClass('active');
+    $('.see-details').on('click', function () {
+        'use strict';
+        location.assign('/investigator/case-details-closed/' + $(this).attr('data-case-id') + '/');
+    });
+    $('#navigation-button').text('Accepted Cases').click(function () {
+        location.assign('/investigator/assigned-cases/');
+    });
+
+    $(".panel-body:first").css( "display", "block" )
+    $(".tools:first > a").attr("class", "fa fa-chevron-down");
+</script>
+{% endblock other_scripts %}

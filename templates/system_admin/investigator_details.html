@@ -1,0 +1,484 @@
+{% extends 'system_admin/base.html' %} {% load staticfiles %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/bootstrap-fileupload/bootstrap-fileupload.css' %}" rel="stylesheet" />
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" /> 
+{% endblock theme_styles %} 
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}"> 
+
+<style>
+    .language-select, .country-select-dropdown {
+        padding: 0;
+    }
+    
+    .language-select[disabled], .country-select-dropdown[disabled] {
+        padding: 6px 12px;
+    }
+    
+    .language-select > .select2-choice, .country-select-dropdown > .select2-choice {
+        height: 100%;
+    }
+    
+    .readonly-field {
+        border: none;
+    }
+</style>
+{% endblock other_styles %} 
+
+{% load range_filter %} 
+
+{% block content %}
+
+<form action="." method="post" class="form-horizontal bucket-form" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Investigator details
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                    <span class="pull-right panel-buttons">
+                         {% if investigator.is_active %}
+                         <button type="button" class="btn btn-warning">Suspend</button>
+                         {% else %}
+                         <button type="button" class="btn btn-success resume">Resume</button>
+                         <button type="button" class="btn btn-danger">Delete</button>
+                         {% endif %}
+                     </span>
+                </header>
+                <div class="panel-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">First Name <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="first-name" class="form-control" value="{{ investigator.user.first_name }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Last Name <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="last-name" class="form-control" value="{{ investigator.user.last_name }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Nickname</div>
+                        <div class="col-lg-6">
+                            <input type="text" name="nickname" class="form-control" value="{{ investigator.nickname }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Languages <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <select name="languages" required id="" class="form-control mbot-15 language-select" multiple>
+                                {% for language in languages %}
+                                <option value="{{ language }}">{{ language }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Phone number 1 <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <a id="phone-number-one-link" href="tel:{{ phone_number_one }}">
+                                        <input required name="phone-1" type="text" class="form-control" value="{{ investigator.phone_number_one }}"></a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Phone number 2</div>
+                            <div class="col-lg-6">
+                                {% if phone_number_two %}
+                                <a id="phone-number-two-link" href="tel:{{ phone_number_two }}">
+                                    <input  name="phone-2" type="text" class="form-control" value="{{ investigator.phone_number_two }}">
+                                </a>
+                                {% else %}
+                                <input  name="phone-2" type="text" class="form-control" value="{{ investigator.phone_number_two }}">
+                                {% endif %}
+                            
+                            </div>
+                        </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 1 <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="email-1" type="email" class="form-control" value="{{ investigator.email_one }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 2</div>
+                        <div class="col-lg-6">
+                            <input name="email-2" type="email" class="form-control" value="{{ investigator.email_two }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1 <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="street-1" type="text" class="form-control" value="{{ investigator.address.street_one }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2 </div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="street-2" type="text" class="form-control" value="{{ investigator.address.street_two }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="city" type="text" class="form-control" value="{{ investigator.address.city }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="state" type="text" class="form-control" value="{{ investigator.address.state }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Country <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <select name="country" required id="" class="form-control mbot-15 country-select-dropdown">
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="zip-code" type="text" class="form-control" value="{{ investigator.address.zip_code }}">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1 (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-street-1" type="text" class="form-control" {% if investigator.secondary_address %} value="{{ investigator.secondary_address.street_one }}" {% endif %}>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2 (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-street-2" type="text" class="form-control" {% if investigator.secondary_address %} value="{{ investigator.secondary_address.street_two }}" {% endif %}>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-city" type="text" class="form-control" {% if investigator.secondary_address %} value="{{ investigator.secondary_address.city }}" {% endif %}>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-state" type="text" class="form-control" value="{{ investigator.secondary_address.state }}" {% if investigator.secondary_address %} value="{{ investigator.secondary_address.state }}" {% endif %}>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Country (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <select name="secondary-country" id="" class="form-control mbot-15 country-select-dropdown">
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code (secondary)</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="secondary-zip-code" type="text" class="form-control" {% if investigator.secondary_address %} value="{{ investigator.secondary_address.zip_code }}" {% endif %}>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Certification</div>
+                        <div class="col-lg-6">
+                            <select name="certification" id="" class="form-control mbot-15">
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">More info</div>
+                        <div class="col-lg-6">
+                            <textarea class="form-control" name="more-info" rows="6">{{ investigator.more_info }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Photograph</label>
+                                        <div class="fileupload fileupload-new" data-provides="fileupload">
+                                            <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                                {% if investigator.photograph %}
+                                                <img src="{{ investigator.photograph.url }}" alt="">
+                                                {% else %}
+                                                <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=no+image" alt="">
+                                                {% endif %}
+                                            </div>
+                                            <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+                                            <div>
+                                               <span class="btn btn-white btn-file">
+                                                   <span class="fileupload-new"><i class="fa fa-paper-clip"></i> Select image</span>
+                                                   <span class="fileupload-exists"><i class="fa fa-undo"></i> Change</span>
+                                                   <input type="file" class="default" name="photograph" accept="image/*">
+                                               </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Rates
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                {% include 'system_admin/investigator_rates_snippet.html' %}
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-buttons">
+                <button type="button" class="btn btn-success">Edit</button>
+                <button type="submit" class="btn btn-info">Update</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-fileupload/bootstrap-fileupload.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+<script src="{% static 'common/js/jquery.inputmask.bundle.min.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+    $('#navigation-button').html('<i class="fa fa-chevron-left"></i> Back');
+    $('#navigation-button').click(function () {
+        location.assign('/administrator/investigators/');
+    });
+    
+    $.validator.addMethod('phone', function (value) {
+        if (value == '') {
+            return true;
+        }
+        
+        return /^\+\d \d\d\d\-\d\d\d\-\d\d\d\d$/.test(value); 
+    }, 'Please enter a valid phone number.');
+    
+    $('form').validate({
+        rules: {
+            'phone-1': {
+                phone: true
+            },
+            'phone-2': {
+                phone: true
+            }
+        }
+    });
+    
+    $('input[name*=phone]').inputmask('+9 999-999-9999');
+    
+    $('a[data-nav-item=investigators]').addClass('active');
+    
+    $('input, textarea').attr('readonly', 'readonly');
+    $('select').attr('disabled', 'disabled');
+    
+    $('select[name=country]').val('{{ investigator.address.country }}');
+    $('select[name=secondary-country]').val('{{ investigator.secondary_address.country }}');
+    
+    $('select[name=languages]').val({{ investigator.languages|safe }});
+
+    $('.form-buttons').one('click', function() {
+        
+        $(this).toggleClass('editing');
+        $('input, textarea').removeAttr('readonly');
+        $("#phone-number-two-link").removeAttr("href")
+        $("#phone-number-one-link").removeAttr("href")
+        $('select').removeAttr('disabled');
+        $('.rating').toggleClass('fixed');
+        $('.fileupload .btn').toggleClass('editing');
+        
+    });
+    
+    $('.rating:not(.fixed) .star').click(function () {
+        $('.star').removeClass('filled');
+        $(this).addClass('filled');
+        
+        $('input[name=rating]').val($('.star.filled ~ .star').size() + 1);
+    });
+         
+    $('.language-select, .country-select-dropdown').select2({
+        width: '100%',
+        disabled: true
+    });
+    
+    $('.rating').addClass('fixed');
+    $('.star:nth-last-child({{ investigator.rating }})').addClass('filled');
+    
+    $('.btn-warning').click(function () {
+        'use strict';
+        swal({
+            title: 'Suspend Account', 
+            text: 'Are you sure?', 
+            type: 'question',
+            confirmButtonText: 'Yes',
+            showCancelButton: true,
+            cancelButtonText: 'No'
+        }).then(function () {
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                context: 'suspend'
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'The investigator has been suspended',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+        return false;
+        
+    });
+    
+    $('.btn-success.resume').click(function () {
+        'use strict';
+        swal({
+            title: 'Resume Account', 
+            text: 'Are you sure?', 
+            type: 'question',
+            confirmButtonText: 'Yes',
+            showCancelButton: true,
+            cancelButtonText: 'No'
+        }).then(function () {
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                context: 'resume'
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'The investigator has been resumed',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+        return false;
+        
+    });
+    
+    $('.btn-danger').click(function () {
+        'use strict';
+        swal({
+            title: 'Delete Account', 
+            text: 'Are you sure?', 
+            type: 'question',
+            confirmButtonText: 'Yes',
+            showCancelButton: true,
+            cancelButtonText: 'No'
+        }).then(function () {
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                context: 'delete'
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'The investigator has been deleted',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                setTimeout(function () {
+                    location.assign('/administrator/investigators/');
+                }, 2000);
+            });
+        });
+        return false;
+        
+    });
+
+</script>
+{% endblock other_scripts %}

@@ -1,0 +1,496 @@
+{% extends 'law_firm/base.html' %} {% load staticfiles %} {% load range_filter %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link rel="stylesheet" href="{% static 'theme/js/data-tables/DT_bootstrap.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" /> {% endblock theme_styles %} {% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+
+<style>
+    .form-row {
+        margin-bottom: 10px;
+    }
+
+    .form-row:last-of-type {
+        margin-bottom: 30px;
+    }
+
+    .popup-form-data .label {
+        font-weight: bold;
+        display: inline-block;
+        vertical-align: middle;
+        width: 45%;
+        color: rgb(84, 84, 84);
+        text-align: left;
+    }
+
+    .popup-form-data .value {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50%;
+        color: rgb(84, 84, 84);
+        text-align: left;
+    }
+
+    .investigator-name {
+        cursor: pointer;
+    }
+
+    .rating span.star.filled:before,
+    .rating span.star.filled~span.star:before {
+        content: "\f005";
+        color: #41CAC0;
+    }
+
+    .swal2-modal .swal2-input[type=number] {
+        max-width: 100%;
+    }
+
+    .case-extras {
+        text-align: left;
+    }
+
+    .case-extras h2 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+    .dataTables_empty{
+        text-align: center
+    }
+    /* .adv-table {
+        margin-top: -64px;
+    }
+
+    #paginator {
+        background-color: gainsboro;
+    }
+
+    .current {
+        margin-right: 7px;
+    } */
+    @media only screen and (max-width: 500px) {
+    #cases-table{
+        overflow-y:scroll;
+    display:block;
+        }
+    }
+</style>
+{% endblock other_styles %} {% load range_filter %} {% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading no-mouse-events">
+                All Cases to be charged
+                <div style="float:right">
+                        {% csrf_token %}
+                        <input type="hidden" name="case-ids" value="">
+                        <div class="buttons-holder bulk-buttons hide" style="margin-top: -6px;">
+                                <!-- <button class="btn btn-primary btn-sm mark-as-paid" type="button" aria-expanded="false">Mark cases as paid</button> -->
+                                <button class="btn btn-primary btn-sm combined-dispute" type="button" aria-expanded="false">Raise dispute for selected cases</button>
+                        </div>
+                    </div>
+                
+            </header>
+            <div class="panel-body">
+                <!-- <div class="pagination">
+                    <span class="step-links">
+                                {% if cases.has_previous %}
+                                   <button id="paginator" onclick="window.location.href='?page={{ cases.previous_page_number }}'"><i class="fa fa-chevron-left" style="color:black" aria-hidden="true"></i></button>
+                                {% endif %}
+                        
+                                <span class="current">
+                                     {{ cases.number }} of {{ cases.paginator.num_pages }}
+                                </span> {% if cases.has_next %}
+                    <button id="paginator" onclick="window.location.href='?page={{ cases.next_page_number }}'"><i class="fa fa-chevron-right" style="color:black" aria-hidden="true"></i></button>                    {% endif %}
+                    </span>
+                </div> -->
+                {% csrf_token %}
+                <div class="adv-table editable-table">
+                    <div class="clearfix">
+                    </div>
+                    <div class="space15"></div>
+                    <table class="table table-striped table-hover table-bordered" id="cases-table">
+                        <thead>
+                            <tr>
+                                <th class="no-sort">Select
+                                    <div class="square-green single-row" style="display: inline-block; width: 20px;">
+                                                <input id="select-all-cases" type="checkbox">
+                                            </div>
+                                </th>
+                                <th class="no-sort">Case No</th>
+                                <th class="no-sort">Date</th>
+                                <th class="no-sort">Case Name</th>
+                                <th class="no-sort">Location</th>
+                                <th class="no-sort">Status</th>
+                                <th class="no-sort">Broker</th>
+                                <th class="no-sort">Amount Billed</th>
+                                <th class="no-sort">Raise Dispute</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for case in cases %}
+                            <tr class="case-row" data-case-id="{{ case.pk }}">
+                                <td>
+                                        <div class="square-green single-row" style="display: inline-block; width: 20px;">
+                                            <input id="{{ case.pk }}" class="case-select-to-mark-paid" type="checkbox" value="{{ case.pk }}">
+                                        </div>
+                                    </td>
+                                <td>{{case.pk}}</td>
+                                <td> {{ case.created_at}}</td>
+                                <td><a href="/law-firm/case-details/{{ case.pk }}/">{{ case.name }}</a></td>
+                                <td class="table-dropdown-holder">
+                                    <span class="text">{{ case.client_address }}</span> {% if case.client_address.gmaps_link%}
+                                    <span class="options"><a href="{{ case.client_address.gmaps_link | safe }}" target="_blank"><i class="fa fa-map-marker"></i></a></span>                                    {% else %}
+                                    <span class="options">
+                                        <i class="fa fa-map-marker"></i>
+                                    </span> {% endif %}
+                                </td>
+                                <td class="table-dropdown-holder">
+                                        <span class="text">
+                                            {% if case.is_signature_obtained == True %}<p> Signature obtained </p>
+                                            {% else %} <p> Signature not obtained </p>
+                                            {% endif %}
+                                    </td>
+                                <td style="text-align: center;">
+                                    {% if case.created_by %}
+                                        <span style="cursor: pointer" class="created-by-name-table text" data-created-by-id="{{ case.created_by.pk }}">{{ case.created_by.user.first_name}} {{case.created_by.user.last_name}} </span>
+                                    {% else %}
+                                    <span style="cursor: pointer" class="created-by-name-table text" data-created-by-id="{{ case.created_by_master.pk }}">{{ case.created_by_master.user.first_name}} {{case.created_by_master.user.last_name}} </span>                                   
+                                    {% endif %}
+                                </td>
+                                <td style="text-align: center;">
+
+                                        <b>${{case.amount_billed_to_law_firm }}</b>
+
+                                </td>
+                                <td style="text-align: center;">
+                                    {% if case.is_dispute_raised %}
+                                    Dispute Raised
+                                    <i class="fa fa-info-circle extra-info-holder" style="margin-left:10px" data-stringified-info="{{case.dispute_description}}"></i>
+                                    {% else %}
+                                    <button class="btn btn-primary single-dispute" data-case-id ="{{case.pk}}" style="background-color: cadetblue;">Dispute</button>
+                                    {% endif %}
+                                </td>
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery-1.10.2.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery-migrate.js' %}"></script>
+
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script class="include" type="text/javascript" src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/data-tables/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/js/data-tables/DT_bootstrap.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+
+<!--script for this page only-->
+<script src="{% static 'theme/js/table-editable.js' %}"></script>
+<script src="{% static 'theme/js/table-editable1.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+<script>
+    $(function () {
+        EditableTable.init();
+    });
+
+</script>
+
+<!-- END JAVASCRIPTS -->
+{% endblock theme_scripts %} {% block other_scripts %}
+<script src="{% static 'case_list/js/script.js' %}"></script>
+<!-- <script src="{% static 'law_firm/js/details.js' %}"></script> -->
+<script>
+    var investigator_assigned = false, assign_investigator, show_investigator, case_id, additional_expenses, no_of_miles;
+    $('a[data-nav-item=cases-to-be-charged]').addClass('active');
+    $('.select2-filter').select2({
+        width: '90%'
+    });
+    // $('#navigation-button').text('');
+    // $('#navigation-button').click(function () {
+    //     location.assign('/law-firm/create-new-case/');
+    // });
+    $('#navigation-button').remove();
+
+        $('.investigator-name').click(function () {
+            show_investigator($(this).attr('data-investigator-id'), true);
+        });
+        
+
+        $('.square-green input').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+            increaseArea: '20%' // optional
+        });
+        $('.select2-filter').select2({
+            width: '90%'
+        });
+        EditableTable1.init();
+    
+
+
+    show_investigator = function (investigator_id, show_list) {
+        'use strict';
+        debugger;
+        $.post('/law-firm/show-investigator-details/', {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            investigator_id: investigator_id
+        }, function (returned_data) {
+            swal({
+                title: 'Investigator details',
+                customClass: 'popup-form-data',
+                html: returned_data
+            }).then(function () {
+                
+            });
+        });
+
+    };
+    //Jquery pagination 
+
+
+
+
+    // $('.assign-investigator').on('click', function () {
+    //     case_id = $(this).attr('data-case-id');
+    //     assign_investigator();
+    // });
+
+    $('.investigator-name-table').on('click', function () {
+        show_investigator($(this).attr('data-investigator-id'), false);
+    });
+    
+
+    $('.single-dispute').click(function(e){
+        var case_id = $(this).attr('data-case-id');
+        swal({
+            title: 'Raise dispute for the case',
+            text: 'Are you sure?',
+            html:'<br><div style="" class="form-horizontal"><div class="form-group"> <div class="col-md-9" style="margin-left:65px;"> <textarea style="height: 85px;" id="dispute-reason" name="dispute-reason" placeholder="Enter the dispute description" class="form-control"></textarea> </div></div></div>',
+            confirmButtonText: 'Submit',
+            preConfirm: function () {
+                debugger
+                return new Promise(function (resolve, reject) {
+                    debugger
+                var dispute_description = $('#dispute-reason').val();
+                if (dispute_description != '')
+                    resolve({
+                        dispute_description
+
+                    });
+                })
+                
+            }
+            
+        }).then(function (dispute) {
+        dispute_description = dispute['dispute_description']
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'single-dispute',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'case_id',
+                'value':  case_id,
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'dispute-reason',
+                'value':  dispute_description,
+                'type': 'hidden'
+            }))
+            .appendTo('body').submit();
+
+            setTimeout(function () {
+             location.reload();
+         }, 2000);
+    }).catch(swal.noop);
+})
+    $('.combined-dispute').click(function(e){
+        var case_ids = $('input[name=case-ids]').val()
+        swal({
+            title: 'Raise dispute for selected cases',
+            text: 'Are you sure?',
+            html:'<br><div style="" class="form-horizontal"><div class="form-group"> <div class="col-md-9" style="margin-left:65px;"> <textarea style="height: 85px;" id="dispute-reason" name="dispute-reason" placeholder="Enter the dispute description" class="form-control"></textarea> </div></div></div>',
+            confirmButtonText: 'Submit',
+            preConfirm: function () {
+                debugger
+                return new Promise(function (resolve, reject) {
+                    debugger
+                var dispute_description = $('#dispute-reason').val();
+                if (dispute_description != '')
+                    resolve({
+                        dispute_description
+
+                    });
+                })
+                
+            }
+            
+        }).then(function (dispute) {
+            dispute_description = dispute['dispute_description']
+            $('<form action="." method="POST"></form>')
+                .append($('<input>', {
+                    'name': 'csrfmiddlewaretoken',
+                    'value': $('input[name=csrfmiddlewaretoken]').val(),
+                    'type': 'hidden'
+                }))
+                .append($('<input>', {
+                    'name': 'context',
+                    'value':  'combined-dispute',
+                    'type': 'hidden'
+                }))
+                .append($('<input>', {
+                    'name': 'case_ids',
+                    'value':  case_ids,
+                    'type': 'hidden'
+                }))
+                .append($('<input>', {
+                'name': 'dispute-reason',
+                'value':  dispute_description,
+                'type': 'hidden'
+                }))
+                .appendTo('body').submit();
+
+                setTimeout(function () {
+                location.reload();
+            }, 2000);
+        })
+    })
+    $('.extra-info-holder').click(function () {
+    'use strict';
+
+    var info_object = JSON.parse($(this).attr('data-stringified-info')), html_string = '', key;
+
+    for (key in info_object) {
+        if (info_object.hasOwnProperty(key)) {
+            html_string += '<h4>' + key + '</h4>';
+            html_string += '<p>' + info_object[key] + '</p>';
+        }
+    }
+
+    swal({
+        title: 'Status Details',
+        html: html_string,
+        customClass: 'details-popup'
+    });
+});
+
+
+{% if cases %}
+
+     function reselect_bulk_cases() {
+        var case_rows = $('.case-row'), outer_loop, selected_cases = [], selected_case;
+
+        selected_cases = [];
+     
+        for (outer_loop = 0; outer_loop < case_rows.size(); outer_loop += 1) {
+            selected_case = case_rows.eq(outer_loop);
+            if (selected_case.find('.icheckbox_square-green').hasClass('checked')) {
+                selected_cases.push(selected_case.attr('data-case-id'));
+            }
+        }
+
+        $('input[name="case-ids"]').val(JSON.stringify(selected_cases));
+        
+        if (selected_cases.length === 0) {
+            $('.bulk-buttons').addClass('hide');
+        } else {
+            $('.bulk-buttons').removeClass('hide');
+        }
+    }
+     
+    reselect_bulk_cases();
+     
+    setInterval(reselect_bulk_cases, 1000);
+    
+    {% endif %}
+    setTimeout(function () {
+         $('#select-all-cases + ins').click(function () {
+             if ($(this).parent().hasClass('checked')) {
+                 $('.case-row .icheckbox_square-green').addClass('checked');    
+             } else {
+                 $('.case-row .icheckbox_square-green').removeClass('checked');
+             }
+         });
+     }, 3000);
+
+$('.extra-info-holder').click(function () {
+    'use strict';
+
+    var info_object = $(this).attr('data-stringified-info'), html_string = '', key;
+    if (info_object == '')
+        info_object = "No info"
+    var field
+        html_string += '<h4> Dispute Description </h4>';
+        html_string += '<p>' + info_object + '</p>';
+
+    swal({
+        title: 'Dispute Details',
+        html: html_string,
+        customClass: 'details-popup'
+    });
+});
+</script>
+{% endblock other_scripts %}

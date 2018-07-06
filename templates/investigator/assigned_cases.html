@@ -1,0 +1,459 @@
+{% extends 'investigator/base.html' %}
+
+{% load staticfiles %}
+
+{% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'theme/js/data-tables/DT_bootstrap.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+{% endblock theme_styles %}
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'investigator/css/style.css' %}">
+<style>
+    #back-button {
+        display: none;
+    }
+    .law-firm-select, .country-select-dropdown {
+        padding: 0;
+    }
+    
+    .law-firm-select > .select2-choice, .country-select-dropdown > .select2-choice {
+        height: 100%;
+    }
+</style>
+{% endblock other_styles %}
+
+{% load range_filter %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <div class="panel-body">
+                <div class="panel-central-heading">Pending cases: {{ pending_cases |length }}</div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<div id="assigned-cases">
+    <div class="row">
+        {% for case in pending_cases %}
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                     {{case.name}}
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-up"></a>
+                    </span>
+                </header>
+                <div class="panel-body" {% if working_case or forloop.counter > 1 %} style="display: none;" {% endif %}>
+                    <form action="." method="post" class="form-horizontal bucket-form">
+                        {% csrf_token %}
+                        {% comment %} 
+                        {% include 'case_form_snippet.html' %}
+                        {% endcomment %} 
+
+                                                
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Name <sup>*</sup></div>
+                            <div class="col-sm-6 col-lg-6">
+                                <input type="text" class="form-control" required name="case-name" value="{{ case.name }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Law Firm <sup>*</sup></div>
+                            <div class="col-sm-6 col-lg-6">
+                                <select name="law-firm" required id="" class="form-control mbot-15 law-firm-select">
+                                    {% for law_firm in law_firms %}
+                                    <option value="{{ law_firm.pk }}" {% if law_firm.pk == case.law_firm.pk %}selected{% endif %}>{{ law_firm.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>                 
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Adult clients</div>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control tags adult-clients" value="{{ case.adult_clients }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Child clients</div>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control tags child-clients" value="{{ case.child_clients }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Date of Loss of insurance (DOL) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input class="form-control form-control-inline input-medium default-date-picker" size="16" type="text" name="dol" value="{{ case.dol }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Client Name <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input required type="text" name="client-name" class="form-control" value="{{ case.client_name }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Client Language <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input required type="text" name="language" class="form-control" value="{{ case.client_language }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Phone no. <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                 {# <input required name="mobile-phone" type="text" min="0" class="form-control" value="{{ case.client_mobile_phone }}"> #}
+                                {% if case.client_mobile_phone %}
+                                <a id = "{{case.pk}}" href="tel:{{ case.client_mobile_phone }}" >{{ case.client_mobile_phone }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Home phone no.</div>
+                            <div class="col-lg-6">
+                                {% if case.client_home_phone %}
+                                <a href="tel:{{ case.client_home_phone }}" >{{ case.client_home_phone }}</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Email address (primary) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input required name="primary-email" type="email" class="form-control" value="{{ case.client_primary_email }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Email address (secondary)</div>
+                            <div class="col-lg-6">
+                                <input name="secondary-email" type="email" class="form-control" value="{{ case.client_secondary_email }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Address line 1 <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input required name="street-1" type="text" class="form-control" value="{{ case.client_address.street_one }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Address line 2</div>
+                            <div class="col-lg-6">
+                                <input name="street-2" type="text" class="form-control" value="{{ case.client_address.street_two }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">City <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input required name="city" type="text" class="form-control" value="{{ case.client_address.city }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">State <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input required name="state" type="text" class="form-control" value="{{ case.client_address.state }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Country <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="text" class="form-control" value="{{ case.client_address.country }}" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">ZIP code <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input required name="zip-code" type="text" class="form-control" value="{{ case.client_address.zip_code }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Locality</div>
+                            <div class="col-lg-6">
+                                <select name="locality" id="" class="form-control mbot-15">
+                                    <option value="In Area" {% if case.locality == "In Area" %}selected{% endif %}>In Area</option>
+                                    <option value="Out of Area" {% if case.locality == "Out of Area" %}selected{% endif %}>Out of Area</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Case type</div>
+                            <div class="col-lg-6">
+                                <select name="type" id="" class="form-control mbot-15">
+                                    <option value="Case 1" {% if case.type == "Case 1" %}selected{% endif %}>Case 1</option>
+                                    <option value="Case 2" {% if case.type == "Case 2" %}selected{% endif %}>Case 2</option>
+                                    <option value="Case 3" {% if case.type == "Case 3" %}selected{% endif %}>Case 3</option>
+                                    <option value="Case 4" {% if case.type == "Case 4" %}selected{% endif %}>Case 4</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                                <div class="col-xs-6 col-sm-3 control-label col-lg-3"> Attched Documents</div>
+                                <div class="col-xs-6 col-lg-6">
+                                    <div class="form-control" style="border: none;height: auto;">
+                                        <div class="file-holder">
+                                            {% for attached_document in attached_documents %}
+                                            {% if attached_document.case = case %}
+                                            <div>
+                                            {{ attached_document.document.file_name }} <button class="btn btn-clear btn-sm download-document" type="button" style="margin-left:10px;background: lightgray;    margin-top: -5px;float:right" href="#" document-id="{{ attached_document.document.pk }}"><i class="fa fa-download" aria-hidden="true"></i></button>
+                                        </div>
+                                            <br>
+                                            {% endif %}
+                                                {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <!-- <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Basic Fee (Law Firm) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="basic-fee-for-case-law-firm" class="form-control" value="{{ case.basic_fee_law_firm }}">
+                            </div>
+                        </div> -->
+                        {% if not case.is_investigator_paid %}
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Basic Fee (Investigator) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="basic-fee-for-case-investigator" class="form-control" value="{{ case.basic_fee_investigator }}">
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Basic Fee (Investigator) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="hidden" name="basic-fee-for-case-investigator" value="{{ case.basic_fee_investigator }}">
+                                <div class="form-control" style="border: none;">{{ case.basic_fee_investigator }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <!-- <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">No. of free miles (Law Firm) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="no-of-free-miles-law-firm" class="form-control" value="{{ case.no_of_free_miles_law_firm }}">
+                            </div>
+                        </div> -->
+                        {% if not case.is_investigator_paid %}
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">No. of free miles (Investigator) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="no-of-free-miles-investigator" class="form-control" value="{{ case.no_of_free_miles_investigator }}">
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">No. of free miles (Investigator) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="hidden" name="no-of-free-miles-investigator" value="{{ case.no_of_free_miles_investigator }}">
+                                <div class="form-control" style="border: none;">{{ case.no_of_free_miles_investigator }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <!-- <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Mileage rate (Law Firm) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="mileage-rate-law-firm" class="form-control" value="{{ case.mileage_rate_law_firm }}">
+                            </div>
+                        </div> -->
+                        {% if not case.is_investigator_paid %}
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Mileage rate (Investigator) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="mileage-rate-investigator" class="form-control" value="{{ case.mileage_rate_investigator }}">
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Mileage rate (Investigator) <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="hidden" name="mileage-rate-investigator" value="{{ case.mileage_rate_investigator }}">
+                                <div class="form-control" style="border: none;">{{ case.mileage_rate_investigator }}</div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">No. of miles travelled</div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="no-of-miles-travelled" class="form-control" value="{{ case.no_of_miles_travelled }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Additional expenses by investigator</div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="additional-expenses" class="form-control" value="{{ case.additional_expenses }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Expected payment <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <input type="number" min="0" name="expected-payment-for-case" class="form-control" value="{{ case.expected_payment }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Total payment</div>
+                            <div class="col-lg-6">
+                                <div class="form-control" style="border: none;">{{ case.get_investigator_price }} {% if not case.is_investigator_paid %}(Subject to change until the case is closed){% endif %}</div>
+                            </div>
+                        </div>
+
+                        
+
+                        {% if not working_case %}
+                        <div class="form-group">
+                            <div class="col-xs-6 col-lg-6">
+                                <div class="button-holder">
+                                    <button type="button" data-case-id="{{ case.pk }}" class="btn btn-success success accept-case">Accept</button>
+                                </div>
+                            </div>
+                            <div class="col-xs-6 col-lg-6">
+                                <div class="button-holder">
+                                    <button type="button" data-case-id="{{ case.pk }}" class="btn btn-danger failure decline-case">Decline</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </section>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% if working_case %}
+    <div id="working-case">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="row">
+                    <div class="col-md-12">
+                        <section class="panel case-card">
+                            <header class="panel-heading">
+                                Working case
+                                {% if pending_cases and pending_cases.length > 0 %}
+                                <span class="tools pull-right">
+                                    <a href="javascript:;" class="fa fa-chevron-down"></a>
+                                </span>
+                                {% endif %}
+                            </header>
+                            <div class="panel-body">
+                                <div class="panel-central-heading">Status: {{ working_case.status }}</div>
+                                <p class="client-info">{{ working_case.client_name }} <br> 
+                                {{ working_case.client_phone_number }} <br>
+                                {% if working_case.client_address.gmaps_link %}
+                                <span class="options"><a class="directions" href="{{ working_case.client_address.gmaps_link | safe }}" target="_blank">Directions</a></span>
+                                {% endif %}
+                                </p>
+                                <div class="working-case-buttons">
+                                    <button id="see-details" data-case-id="{{ working_case.pk }}" type="button" class="btn btn-primary btn-lg btn-block">See details</button>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{% endblock content %}
+
+
+{% block theme_scripts %}
+<script src="{% static 'theme/js/jquery-1.10.2.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery-migrate.js' %}"></script>
+
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script class="include" type="text/javascript" src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/js/data-tables/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/js/data-tables/DT_bootstrap.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+
+<!--script for this page only-->
+<script src="{% static 'theme/js/table-editable.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+
+<!-- END JAVASCRIPTS -->
+<script>
+    jQuery(document).ready(function() {
+        EditableTable.init();
+    });
+</script>
+{% endblock theme_scripts %}
+
+{% block other_scripts %}
+<script src="{% static 'investigator/js/script.js' %}"></script>
+<script>
+    {% for case in pending_cases %}
+    phone_number =  "{{case.client_mobile_phone}}"
+    var str = phone_number.replace(" ", "");
+     phone_number = str.replace(/\-/g, '');
+    $("#"+ {{case.pk}}).attr("href","tel:"+phone_number)
+    {% endfor %}
+    $('a[data-nav-item=assigned-cases]').addClass('active');
+    $('#see-details').on('click', function () {
+        'use strict';
+        location.assign('/investigator/case-details/' + $(this).attr('data-case-id') + '/');
+    });
+    $('#navigation-button').text('Closed Cases');
+    $('#navigation-button').click(function () {
+        location.assign('/investigator/closed-cases/');
+    });
+    
+    $('input, textarea').attr('readonly', 'readonly');
+    $('select').attr('disabled', 'disabled');
+
+
+     $('.adult-clients').tagsInput({
+        width:'auto',
+        defaultText: ''
+    });
+    $('.child-clients').tagsInput({
+        width:'auto',
+        defaultText: ''
+    });
+    $('#country-select').select2({
+            width: '100%'
+        });
+
+        $('.download-document').click(function () {
+        //  debugger
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'download-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+</script>
+{% endblock other_scripts %}

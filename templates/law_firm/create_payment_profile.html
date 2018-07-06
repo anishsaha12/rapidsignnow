@@ -1,0 +1,953 @@
+{% extends 'law_firm/base.html' %}
+
+{% load staticfiles %}
+
+{% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet"> 
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet">   
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet" >
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+<!-- <link href="{% static 'theme/css/bootstrap.css' %}" rel="stylesheet"> -->
+<!-- Custom styles for this template -->
+<link rel="stylesheet" href="{% static 'theme/css/style.css' %}">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+{% endblock theme_styles %}
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'theme/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<!-- <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous"> -->
+<!-- <link rel="stylesheet" href="{% static 'investigator/css/style.css' %}"> -->
+<style>
+        /* .panel-body{
+            display: none;
+        } */
+        
+    #submit-details{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 500px;
+    /* width: 100%; */
+    background-color: #1FB5AD
+
+    }
+    #edit-credit-card-details{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 500px;
+    /* width: 100%; */
+    background-color:rgb(68, 187, 181);
+
+    }
+    #edit-bank-account-details{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 500px;
+    /* width: 100%; */
+    background-color:rgb(68, 187, 181);
+
+    }
+    #update-credit-card-details{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 500px;
+    /* width: 100%; */
+    /* background-color: rgb(19, 206, 196); */
+        display: none;
+    }
+
+    #update-bank-account-details{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 500px;
+    /* width: 100%; */
+    /* background-color: rgb(19, 206, 196); */
+        display: none;
+    }
+
+    .form-row {
+        margin-bottom: 10px;
+    }
+    .automatic-payment-details{
+        margin-bottom: 40px;
+        /* border-bottom:1px solid #eff2f7; */
+    }
+    .input-large > label[class*="error"]{
+    position: absolute;
+    top: 35px;
+    right: 15px;
+    font-size: 12px;
+}
+.taginput{
+    border-radius: 5px;
+}
+  
+    </style>
+{% endblock other_styles %}
+
+{% load range_filter %}
+
+
+{% block content %}
+
+
+
+{% if primary_payment_method == "" %}
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                            Credit payment details
+                            <span class="pull-right panel-buttons" style="margin-top:-5px"><img  src="http://i76.imgup.net/accepted_c22e0.png"></img></span>
+                             
+                            <!-- <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                 </span> -->
+                 
+                 
+            </header>
+        
+            <div class="panel-body">
+                    <form method="post" action="." id="payment-details-credit-card-form" class="form-horizontal bucket-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="context" value="create-new-customer-profile">
+                                <div class="form-group">
+                                        <div class="col-sm-3 control-label col-lg-3">Name</div>
+                                        <div class="col-lg-6">
+                                <input class="form-control" type="text" name="name" value="{{law_firm.name}}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Email</div>
+                            <div class="col-lg-6">
+                            <input class="form-control" type="text" name="email" value="{{law_firm.email_one}}">
+                        </div>
+                        </div>
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Invoice Recipients</div>
+                                <div class="col-lg-6">
+                                    <input id="credit-card-alternative-emails" type="text" name="alternative-emails-credit-card" class="form-control tags alternative-emails-credit-card" value="{{law_firm.invoice_recipients}}">
+                                </div>
+                            </div>
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Payment type</div>
+                                <div class="col-sm-6 col-lg-3" style="    margin-top: 6px;">
+                                        <div class="form-check" style="margin-left:-150px">
+                                        <input class="form-check-input" type="radio" name="payment-type" value="automatic" checked="checked" id="radio-auto"><label class="form-check-label" for="radio-auto">&nbsp;&nbsp;Automatic </label></div>
+                                        <!-- <div class="form-check" style="margin-left:-170px"><input class="form-check-input" type="radio" name="payment-type" value="manual" id="radio-manual"><label class="form-check-label" for="radio-manual">&nbsp;&nbsp;Manual </label></div> -->
+                                </div>
+                            </div>
+                        
+                        <input type="hidden" name="payment-type-context" value="automatic">
+                        <input type="hidden" name="payment-by" value="credit-card">
+                        <div class="form-group" id="payment-details-automatic-credit-card">
+                            <input type="hidden" name="payment-by-context" value="credit-card">    
+                            <!-- <div class="form-group">
+                                        <label class="col-sm-3 control-label col-lg-3">Select Card Type</label>
+                                        <div class="col-lg-9">
+                                            <select>
+                                                <option value="Credit card">Credit Card</option>
+                                                <option value="Debit card">Debit Card</option>
+                                            </select>
+                                        </div>
+
+                                </div> -->
+                                <div class="automatic-payment-details" >
+                                    <div class="col-sm-3 control-label col-lg-3">Card Number <sup>*</sup></div>
+                                    <div class="col-sm-6 col-lg-6">
+                                            <div class="input-group input-large">
+                                        <input class="form-control" type="text" required name="card-number"/>
+                                        <span class="input-group-addon"><i class="fa fa-credit-card credit-card-type"></i></span>
+                                    </div>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="automatic-payment-details">
+                                        <div class="col-sm-3 control-label col-lg-3">Expiration Month/Year <sup>*</sup></div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <div class="input-group input-large">
+                                            <input class="form-control" type="number" required name="expiration-month" id="expiration-month" max="12" min="1">
+                                            <span class="input-group-addon" id="slash">/</span>
+                                            <input class="form-control" type="number" required name="expiration-year" min="2018" max="2050">
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                        </div>
+                        <div class="form-group">
+                                <!-- <div class=""></div> -->
+                                <div class="col-sm-3 col-lg-9" style="margin-left:100px">
+                                        <!-- <div class="square-green single-row" style="display: inline-block; width: 20px;"> -->
+                                        <input type="checkbox" id="accept-terms"  name="credit-card-accept-terms"><label for = "accept-terms" >&nbsp;&nbsp;I accept all the terms and conditions. <a href="{% static 'term_of_use.pdf' %}" target="_blank">Click here</a> to read all the terms and conditions</label> 
+                                        <br><span id="accept-terms-error" style="display:none;color:red"></span>
+                                </div>
+                        </div>
+                      
+                        <br>
+                        <button class="btn btn-primary" type="button" id="submit-credit-card-details">Submit</button>
+                    </form>
+                    <!-- </div> -->
+                </div>
+        </section>
+</div>
+{% else %}
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                    Credit card payment settings
+                    <span class="pull-right panel-buttons" style="margin-top:-5px"><img  src="http://i76.imgup.net/accepted_c22e0.png"></img></span>
+                                
+                            <!-- <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                    </span> -->
+                    
+                    
+            </header>
+            <div class="panel-body">
+                    <form method="post" action="." id="payment-details-credit-card-form" class="form-horizontal bucket-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="context" value="edit-customer-profile">
+                                <div class="form-group">
+                                        <div class="col-sm-3 control-label col-lg-3">Name</div>
+                                        <div class="col-lg-6">
+                                <input class="form-control" type="text" name="name" value="{{law_firm.name}}">
+                            </div>
+                        </div>
+    
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Email</div>
+                            <div class="col-lg-6">
+                            <input class="form-control" type="text" name="email" value="{{law_firm.email_one}}">
+                        </div>
+                        </div>
+    
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Altenative emails</div>
+                                <div class="col-lg-6">
+                                        <input id="credit-card-alternative-emails" type="text" name="alternative-emails-credit-card" class="form-control tags alternative-emails-credit-card" value="{{law_firm.invoice_recipients}}">
+                                </div>
+                            </div>
+
+                        <div class="form-group" id="payment-type">
+                                <div class="col-sm-3 control-label col-lg-3">Payment type</div>
+                                <div class="col-sm-6 col-lg-3" style="    margin-top: 6px;">
+                                    <div class="form-check" style="margin-left:-150px">
+                                    <input class="form-check-input" type="radio" name="payment-type" value="automatic" checked="checked" id="radio-auto"><label class="form-check-label" for="radio-auto">&nbsp;&nbsp;Automatic </label></div>
+                                </div>
+                            </div>
+    
+                            <input type="hidden" name="payment-type-context" value="automatic">
+                            <input type="hidden" name="payment-by" value="credit-card">
+                    
+                        
+                        <div class="form-group" id="payment-details-automatic-credit-card">
+                            <input type="hidden" name="payment-by-context" value="credit-card">    
+                            <!-- <div class="form-group">
+                                        <label class="col-sm-3 control-label col-lg-3">Select Card Type</label>
+                                        <div class="col-lg-9">
+                                            <select>
+                                                <option value="Credit card">Credit Card</option>
+                                                <option value="Debit card">Debit Card</option>
+                                            </select>
+                                        </div>
+    
+                                </div> -->
+                                <div class="automatic-payment-details" >
+                                    <div class="col-sm-3 control-label col-lg-3">Card Number <sup>*</sup></div>
+                                    <div class="col-sm-6 col-lg-6">
+                                            <!-- <div class="input-group input-large"> -->
+                                        <input class="form-control" type="text" required name="card-number" value="{{credit_card_number}}"/>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="automatic-payment-details">
+                                        <div class="col-sm-3 control-label col-lg-3">Expiration Month/Year <sup>*</sup></div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <div class="input-group input-large">
+                                            <input class="form-control" type="text" required value="{{expiration_month}}" name="expiration-month" id="expiration-month" max="12" min="1">
+                                            <span class="input-group-addon" id="slash">/</span>
+                                            <input class="form-control" type="text" required value="{{expiration_year}}" name="expiration-year" min="2000" max="2050">
+                                        </div>
+                                    </div>
+                                </div>
+                                <br>
+                        </div>
+                        
+                        <div class="form-group">
+                                <!-- <div class=""></div> -->
+                                <div class="col-sm-3 col-lg-9" style="margin-left:100px">
+                                        <!-- <div class="square-green single-row" style="display: inline-block; width: 20px;"> -->
+                                        <input type="checkbox" id="accept-terms"  name="credit-card-accept-terms"><label for = "accept-terms" >&nbsp;&nbsp;I accept all the terms and conditions. <a href="{% static 'term_of_use.pdf' %}" target="_blank">Click here</a> to read all the terms and conditions</label> 
+                                        <br><span id="accept-terms-error" style="display:none;color:red"></span>
+                                </div>
+                        </div>
+                    
+                        <br>
+                        <button class="btn btn-primary" type="button" id="edit-credit-card-details">Edit</button>
+                        <button class="btn btn-success" type="submit" id="update-credit-card-details" >Update</button>
+                    </form>
+                    <!-- </div> -->
+            </div>
+        </section>
+    </div>
+{% endif %}
+
+{% if secondary_payment_method == "" %}
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                            Bank account payment details
+                            <span class="pull-right panel-buttons" style="margin-top:-5px"><img  src="http://i76.imgup.net/accepted_c22e0.png"></img></span>
+                            
+            </header>
+        
+            <div class="panel-body">
+                    <form method="post" action="." id="payment-details-bank-account-form" class="form-horizontal bucket-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="context" value="create-new-customer-profile">
+                                <div class="form-group">
+                                        <div class="col-sm-3 control-label col-lg-3">Name</div>
+                                        <div class="col-lg-6">
+                                <input class="form-control" type="text" name="name" value="{{law_firm.name}}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Email</div>
+                            <div class="col-lg-6">
+                            <input class="form-control" type="text" name="email" value="{{law_firm.email_one}}">
+                        </div>
+                        </div>
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Altenative emails</div>
+                                <div class="col-lg-6">
+                                        <input id="bank-account-alternative-emails" type="text" name="alternative-emails-bank-account" class="form-control tags alternative-emails-bank-account" value="{{law_firm.invoice_recipients}}">
+                                </div>
+                            </div>
+                        
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Payment type</div>
+                                <div class="col-sm-6 col-lg-3" style="    margin-top: 6px;">
+                                    <div class="form-check" style="margin-left:-150px">
+                                    <input class="form-check-input" type="radio" name="payment-type" value="automatic" checked="checked" id="radio-auto"><label class="form-check-label" for="radio-auto">&nbsp;&nbsp;Automatic </label></div>
+                                </div>
+                            </div>
+                        
+                        <input type="hidden" name="payment-type-context" value="automatic">
+                        <input type="hidden" name="payment-by" value="bank-account">
+                        <div class="form-group" id="payment-details-automatic-bank-account" >
+                                
+                                <input type="hidden" name="payment-by-context" value="bank-account">
+                                <div class="automatic-payment-details" >
+                                    <div class="col-sm-3 control-label col-lg-3">Account Type</div>
+                                    <div class="col-sm-6 col-lg-3">
+                                        <select class="form-control" name="account_type">
+                                            <option name="checking" value="checking" selected >Checking</option>
+                                            <option name="savings" value="savings">Savings</option>
+                                            <option name="business-checking" value="businessChecking">Business Checking</option>
+                                        </select>
+                                    </div>      
+                                </div>
+                                <br/>
+                                <div class="automatic-payment-details" >
+                                    <div class="col-sm-3 control-label col-lg-3">Account Number <sup>*</sup></div>
+                                    <div class="col-sm-6 col-lg-6">
+                                        <input class="form-control" type="text" required name="account-number"/>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="automatic-payment-details">
+                                        <div class="col-sm-3 control-label col-lg-3">Routing Number <sup>*</sup></div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <input class="form-control" type="text" required name="routing-number" id="routing-number">
+                                        </div>
+                                </div>
+                                <br>
+                                <div class="automatic-payment-details">
+                                    <div class="col-sm-3 col-lg-3 control-label">Name in bank account<sup>*</sup></div>
+                                    <div class="col-sm-6 col-lg-6">
+                                        <input class="form-control"  type="text" name="name-in-bank-account" id="name-in-bank-account" required >
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="form-group">
+                                <div class="col-sm-3 col-lg-9" style="margin-left:100px">
+                                        <input type="checkbox" id="bank-account-accept-terms"  name="bank-account-accept-terms"><label for = "accept-terms" >&nbsp;&nbsp;I accept all the terms and conditions. <a href="{% static 'term_of_use.pdf' %}" target="_blank">Click here</a> to read all the terms and conditions</label> 
+                                        <br><span id="bank-account-accept-terms-error" style="display:none;color:red"></span>
+                                </div>
+                        </div>
+                      
+                        <br>
+                        <button class="btn btn-primary" type="button" id="submit-bank-account-details">Submit</button>
+                    </form>
+                </div>
+        </section>
+</div>
+{% else %}
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                    Bank account payment settings
+                    <span class="pull-right panel-buttons" style="margin-top:-5px"><img  src="http://i76.imgup.net/accepted_c22e0.png"></img></span>
+                                
+                            <!-- <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                    </span> -->
+                    
+                    
+            </header>
+            <div class="panel-body">
+                    <form method="post" action="." id="payment-details-bank-account-form" class="form-horizontal bucket-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="context" value="edit-customer-profile">
+                                <div class="form-group">
+                                        <div class="col-sm-3 control-label col-lg-3">Name</div>
+                                        <div class="col-lg-6">
+                                <input class="form-control" type="text" name="name" value="{{law_firm.name}}">
+                            </div>
+                        </div>
+    
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Email</div>
+                            <div class="col-lg-6">
+                            <input class="form-control" type="text" name="email" value="{{law_firm.email_one}}">
+                        </div>
+                        </div>
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Altenative emails</div>
+                                <div class="col-lg-6">
+                                    <input id="bank-account-alternative-emails" type="text" name="alternative-emails-bank-account" class="form-control tags alternative-emails-bank-account" value="{{law_firm.invoice_recipients}}">
+                                </div>
+                            </div>
+    
+                        <div class="form-group">
+                                <div class="col-sm-3 control-label col-lg-3">Payment type</div>
+                                <div class="col-sm-6 col-lg-3" style="    margin-top: 6px;">
+                                    <div class="form-check" style="margin-left:-150px">
+                                    <input class="form-check-input" type="radio" name="payment-type" value="automatic" checked="checked" id="radio-auto"><label class="form-check-label" for="radio-auto">&nbsp;&nbsp;Automatic </label></div>
+                                </div>
+                            </div>
+    
+                            <input type="hidden" name="payment-type-context" value="automatic">
+                            <input type="hidden" name="payment-by" value="bank-account">
+                        
+                        
+                        <div class="form-group" id="payment-details-automatic-bank-account" >
+                                
+                                <input type="hidden" name="payment-by-context" value="bank-account">
+                                <div class="automatic-payment-details" >
+                                    <div class="col-sm-3 control-label col-lg-3">Account Type</div>
+                                    <div class="col-sm-6 col-lg-3">
+                                        <select class="form-control" name="account_type">
+                                            <option name="checking" value="checking" selected >Checking</option>
+                                            <option name="savings" value="savings">Savings</option>
+                                            <option name="business-checking" value="businessChecking">Business Checking</option>
+                                        </select>
+                                    </div>      
+                                </div>
+                                <br/>
+                                <div class="automatic-payment-details" >
+                                    <div class="col-sm-3 control-label col-lg-3">Account Number <sup>*</sup></div>
+                                    <div class="col-sm-6 col-lg-6">
+                                        <input class="form-control" type="text" required name="account-number" value="{{account_number}}"/>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="automatic-payment-details">
+                                        <div class="col-sm-3 control-label col-lg-3">Routing Number <sup>*</sup></div>
+                                        <div class="col-sm-6 col-lg-6">
+                                            <input class="form-control" type="text" required name="routing-number" id="routing-number" value="{{routing_number}}">
+                                        </div>
+                                </div>
+                                <br>
+                                <div class="automatic-payment-details">
+                                    <div class="col-sm-3 col-lg-3 control-label">Name in bank account<sup>*</sup></div>
+                                    <div class="col-sm-6 col-lg-6">
+                                        <input class="form-control"  type="text" name="name-in-bank-account" id="name-in-bank-account" required value="{{name_in_bank_account}}">
+                                    </div>
+                                </div>
+                        </div>
+                        <div class="form-group" id="accept-terms-div">
+                                <div class="col-sm-3 col-lg-9" style="margin-left:100px">
+                                        <input type="checkbox" id="accept-terms"  name="bank-account-accept-terms"><label for = "accept-terms" >&nbsp;&nbsp;I accept all the terms and conditions. <a href="{% static 'term_of_use.pdf' %}"target="_blank">Click here</a> to read all the terms and conditions</label> 
+                                        <br><span id="accept-terms-error" style="display:none;color:red"></span>
+                                </div>
+                        </div>
+                        <br>
+                        <button class="btn btn-primary" type="button" id="edit-bank-account-details">Edit</button>
+                        <button class="btn btn-success" type="submit" id="update-bank-account-details" >Update</button>
+                    </form>
+            </div>
+        </section>
+</div>
+{% endif %}
+    
+    
+{% endblock content %}
+
+
+{% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+<script src="{% static 'common/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+
+{% endblock theme_scripts %}
+
+{% block other_scripts %}
+
+<script>
+    
+     jQuery(document).ready(function () {
+        $(".panel-body:first").css( "display", "block" )
+        $(".upload").css( "display", "block" )
+        // $(".tools:first > a").attr("class", "fa fa-chevron-down");
+        $('a[data-nav-item=create-payment-profile]').addClass('active');
+        $('.tagsinput').css('border-radius','5px')
+    });
+    $('#navigation-button').remove();
+    $('#bank-account-alternative-emails_tagsinput').css('border-radius','5px')
+    $.validator.addMethod('card-number', function (value) {
+        if (value == '') {
+            return true;
+        }
+        
+        return /^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/.test(value);
+    }, 'Please enter a valid card number.');
+    
+    function check_emails_credit_card(){
+        // debugger
+        value = $('.alternative-emails-credit-card').val()
+        if (value == '')
+        {
+            $('input[name=alternative-emails-credit-card]').removeClass("error")
+            $('label[for=alternative-emails-credit-card').remove()
+            return true
+        }
+        else
+        {
+            emails = value
+            emails = value.split(',')
+
+            for(i=0;i<emails.length;i++)
+            {
+                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if (re.test(emails[i]))
+                {
+                    $('input[name=alternative-emails-credit-card]').removeClass("error")
+                    $('label[for=alternative-emails-credit-card').remove()
+                    // $('input[name=alternative-emails]').parent().append('<label for="alternative-email" class="error">Please enter valid emails</label>')
+                }
+                else
+                { 
+                    console.log("wrong-emails")
+                    $('label[for=alternative-emails-credit-card').remove()
+                    $('input[name=alternative-emails-credit-card]').parent().append('<label for="alternative-emails-credit-card" class="error"></label>')
+                    $('input[name=alternative-emails-credit-card]').addClass("error")
+                    $('label[for=alternative-emails-credit-card').text('Please enter valid emails')
+                    return false
+                }
+            }
+        }
+        return true        
+    }
+
+    function check_emails_bank_account(){
+        debugger
+        value = $('.alternative-emails-bank-account').val()
+        if (value == '')
+        {
+            $('input[name=alternative-emails-bank-account]').removeClass("error")
+            $('label[for=alternative-emails-bank-account').remove()
+            return true
+        }
+        else
+        {
+            emails = value
+            emails = value.split(',')
+
+            for(i=0;i<emails.length;i++)
+            {
+                var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                if (re.test(emails[i]))
+                {
+                    $('input[name=alternative-emails-bank-account]').removeClass("error")
+                    $('label[for=alternative-emails-bank-account]').remove()
+                    
+                    // $('input[name=alternative-emails]').parent().append('<label for="alternative-email" class="error">Please enter valid emails</label>')
+                }
+                else
+                { 
+                    console.log("wrong-emails")
+                    $('label[for=alternative-emails-bank-account]').remove()
+                    $('input[name=alternative-emails-bank-account]').parent().append('<label for="alternative-emails-bank-account" class="error"></label>')
+                    $('input[name=alternative-emails-bank-account]').addClass("error")
+                    $('label[for=alternative-emails-bank-account]').text('Please enter valid emails')
+                    return false
+                }
+            }
+        }     
+        return true   
+    }
+
+    $('.alternative-emails-credit-card').tagsInput({
+        width: 'auto',
+        defaultText: 'add email',
+        'onAddTag' : check_emails_credit_card,
+    });
+    $('.alternative-emails-bank-account').tagsInput({
+        width: 'auto',
+        defaultText: 'add email',
+        'onAddTag' : check_emails_bank_account,
+    });
+    
+    $.validator.addMethod('expiration-month', function (value) {
+        //debugger
+        if (value == '') {
+            return true;
+        }
+        date = new Date()
+        year = date.getFullYear()
+        month = date.getMonth() + 1
+        var yearEntered = $('input[name=expiration-year]').val()
+        if ( yearEntered == year )
+        {
+            if ( $('input[name=expiration-month]').val() >= month )
+            {
+                return true;
+            }
+            else
+            { 
+                return false; 
+            }
+
+        }
+        else
+        {
+            return true;
+        } 
+    }, 'Please enter a valid month');
+    
+    date = new Date()
+    year = date.getFullYear()
+    month = date.getMonth()
+    $('input[name=expiration-year]').attr('min',year)
+    
+
+    
+    
+    $("#submit-credit-card-details").click(function(){
+        //debugger
+        $('#payment-details-credit-card-form').validate({
+            
+         rules: {
+                    'card-number': {
+                        'card-number': true,
+                        required: true
+                    },
+                    'expiration-month':{
+                        'expiration-month':true,
+                        required: true
+                    },
+                    'expiration-year':
+                    {
+                        required: true
+                    }
+                    
+
+                }
+            });
+        if(!$("#accept-terms").is(':checked')){
+                        $("#accept-terms-error").show() 
+                        $("#accept-terms-error").text("*Please accept the terms and conditions")
+                     }
+                     else
+                     {
+                        $("#accept-terms-error").hide()
+                        if (check_emails_credit_card())
+                            {$("#payment-details-credit-card-form").submit()}
+                     }  
+    })
+    $("#submit-bank-account-details").click(function(){
+        //debugger
+        $("#payment-details-bank-account-form").validate({
+            
+            rules: {
+                       'account-number': {
+                           required: true
+                       },
+                       'routing-number':{
+                           required: true
+                       },
+                       'name-in-bank-account':{
+                        required: true
+                       }
+   
+                   }
+               });
+        if(!$("#bank-account-accept-terms").is(':checked')){
+                        $("#bank-account-accept-terms-error").show() 
+                        $("#bank-account-accept-terms-error").text("*Please accept the terms and conditions")
+                     }
+                     else
+                     {
+                        $("#bank-account-accept-terms-error").hide()
+                        if(check_emails_bank_account())
+                        {$("#payment-details-bank-account-form").submit()}
+                     }  
+    })
+    
+     
+    // $("input[name*=expiration]").val("{{expiration_month}}/{{expiration_year}}")
+    $("input[name=payment-type]").change(function(){
+        //debugger
+        paymentType = $("input[name=payment-type]:checked").val()
+        if(paymentType == "automatic")
+        {   
+            $("#payment-details-manual").hide()
+            $("#payment-details-automatic").show()
+            $("input[name=payment-type-context]").remove()
+            $("#payment-details-automatic").append('<input type="hidden" name="payment-type-context" value="automatic">')
+        }
+        else{
+            $("#payment-details-manual").show()
+            $("#payment-details-automatic").hide()
+            $("input[name=payment-type-context]").remove()
+            $("#payment-details-manual").append('<input type="hidden" name="payment-type-context" value="manual">')
+        }
+    })
+
+    $("select[name=payment-by]").change(function(){
+        //debugger
+        payment_by = $("select[name=payment-by]").val()
+        if(payment_by == "credit-card"){   
+            $("#payment-details-automatic-credit-card").show()
+            $("#payment-details-automatic-bank-account").hide()
+            $("input[name=payment-by-context]").remove()
+            $("#payment-details-automatic-credit-card").append('<input type="hidden" name="payment-by-context" value="credit-card">')
+        }
+        else{
+            $("#payment-details-automatic-credit-card").hide()
+            $("#payment-details-automatic-bank-account").show()
+            $("input[name=payment-by-context]").remove()
+            $("#payment-details-automatic-bank-account").append('<input type="hidden" name="payment-by-context" value="bank-account">')
+        }
+    })
+    if($("input[name=payment-type]:checked").val() == "automatic")
+        {
+            $("#payment-details-automatic").show()
+            $("#payment-details-automatic-credit-card").show()
+        }
+    
+    
+    $("#edit-credit-card-details").click(function(){
+    // $("input").removeAttr('readonly', 'readonly')
+    $("input[name=card-number]").removeAttr('readonly','readonly')
+    $("input[name=expiration-year]").removeAttr('readonly','readonly')
+    $("input[name=expiration-month]").removeAttr('readonly','readonly')
+    $("input[name=payment-type]").removeAttr('disabled','disabled')
+    $("input[name=accept-terms]").removeAttr('disabled','disabled')
+    $("select").removeAttr('disabled','disabled')
+    $("#edit-credit-card-details").hide()
+    $("#update-credit-card-details").show()
+    $("#update-credit-card-details").css('display', 'flex').css('align-items','center').css('justify-content','center').css('margin-left', '500px')
+    // $("input[name*=card-number]").inputmask('9999-9999-9999-9999');
+    $("select[name=credit-card-payment-plan]").removeAttr('readonly','readonly')
+    $('input[name=alternative-emails-credit-card]').val("{{law_firm.invoice_recipients}}").removeAttr('readonly','readonly')
+    })
+    
+    $("#edit-bank-account-details").click(function(){
+    // $("input").removeAttr('readonly', 'readonly')
+    $("select[name=account_type").val("{{account_type}}").removeAttr('readonly','readonly')
+    $("input[name=account-number]").removeAttr('readonly','readonly')
+    $("input[name=routing-number]").removeAttr('readonly','readonly')
+    $("input[name=name-in-bank-account]").removeAttr('readonly','readonly')
+    $("input[name=payment-type]").removeAttr('disabled','disabled')
+    $("input[name=accept-terms]").removeAttr('disabled','disabled')
+    $("select").removeAttr('disabled','disabled')
+    $("#edit-bank-account-details").hide()
+    $("#update-bank-account-details").show()
+    $("#update-bank-account-details").css('display', 'flex').css('align-items','center').css('justify-content','center').css('margin-left', '500px')
+    // $("input[name*=card-number]").inputmask('9999-9999-9999-9999');
+    $("select[name=account_type").val("{{account_type}}").removeAttr('readonly','readonly')
+    $("select[name=bank-account-payment-plan]").removeAttr('readonly','readonly')
+    $("select[name=account_type").val("{{account_type}}").removeAttr('readonly','readonly')
+    $('input[name=alternative-emails-bank-account]').val("{{law_firm.invoice_recipients}}").removeAttr('readonly','readonly')
+    })
+
+
+    {% if primary_payment_method != "" %}
+    $("#payment-details-credit-card-form > div:nth-child(3) > div.col-lg-6 > input").attr('readonly','readonly')
+    $("#payment-details-credit-card-form > div:nth-child(4) > div.col-lg-6 > input").attr('readonly','readonly')
+    $("input[name=credit-card-payment-by]").val("{{payment_method}}").attr('readonly','readonly')
+    $("input[name=credit-card-payment-type]").attr('readonly','readonly')
+    $("input[name=credit-card-accept-terms]").attr('checked','checked').attr('disabled','disabled')
+    $("input[name=card-number]").attr('readonly','readonly')
+    $("input[name=expiration-year]").attr('readonly','readonly')
+    $("input[name=expiration-month]").attr('readonly','readonly')
+    $("input[name=name-on-card]").attr('readonly','readonly')
+    $("select[name=credit-card-payment-plan]").attr('readonly','readonly')
+    $("select[name=bank-account-payment-plan]").attr('readonly','readonly')
+    $('input[name=alternative-emails-credit-card]').val("{{law_firm.invoice_recipients}}").attr('readonly','readonly')
+    $('input[name=alternative-emails-bank-account]').val("{{law_firm.invoice_recipients}}")
+    {% else %}
+    // $("input[name*=card-number]").inputmask('9999-9999-9999-9999');
+    {% endif %}
+    
+    {% if secondary_payment_method != "" %}
+    $("#payment-details-bank-account-form > div:nth-child(3) > div.col-lg-6 > input").attr('readonly','readonly')
+    $("#payment-details-bank-account-form > div:nth-child(4) > div.col-lg-6 > input").attr('readonly','readonly')
+    $("input[name=bank-account-payment-by]").val("{{payment_method}}").attr('readonly','readonly')
+    $("input[name=bank-account-payment-type]").attr('readonly','readonly')
+    $("input[name=bank-account-accept-terms]").attr('checked','checked').attr('disabled','disabled')
+    $("select[name=account_type").val("{{account_type}}").attr('readonly','readonly')
+    $("input[name=account-number]").attr('readonly','readonly')
+    $("input[name=routing-number]").attr('readonly','readonly')
+    $("input[name=name-in-bank-account]").attr('readonly','readonly')
+    $("select[name=credit-card-payment-plan]").attr('readonly','readonly')
+    $("select[name=bank-account-payment-plan]").attr('readonly','readonly')
+    $('input[name=alternative-emails-bank-account]').val("{{law_firm.invoice_recipients}}").attr('readonly','readonly')
+    $('input[name=alternative-emails-credit-card]').val("{{law_firm.invoice_recipients}}")
+    
+    {% endif %}
+
+    $('input[name=name]').attr('readonly','readonly')
+    $('input[name=email]').attr('readonly','readonly')
+
+    {% if error %}
+        var error = "{{error}}"
+        swal({
+            title: 'Error',
+            text: error,
+            type: 'error',
+            timer: 3000,
+            showConfirmButton: false
+        });
+    {% endif %}
+
+function getCreditCardType(accountNumber)
+    {
+
+        //start without knowing the credit card type
+        var result = "unknown";
+
+        //first check for MasterCard
+        if (/^5[1-5]/.test(accountNumber))
+        {
+            result = "mastercard";
+        }
+
+        //then check for Visa
+        else if (/^4/.test(accountNumber))
+        {
+            result = "visa";
+        }
+        //then check for Discover
+        else if (/^6011|64|65/.test(accountNumber))
+        {
+            result = "discover";
+        }
+
+        //then check for AmEx
+        else if (/^3[47]/.test(accountNumber))
+        {
+            result = "amex";
+        }
+        //then check for JCB
+        else if (/^35/.test(accountNumber))
+        {
+            result = "jcb";
+        }
+
+
+        return result;
+}
+
+$('input[name=card-number]').keyup(function(value){
+    card_number = $('input[name=card-number]').val()
+    card_type =  getCreditCardType(card_number)
+
+    if (card_number == "")
+    {
+        $('.credit-card-type').find('img').remove()
+        $('.credit-card-type').addClass('fa fa-credit-card')
+    }
+
+    if (card_type == "amex")
+    { 
+        $('.credit-card-type').removeClass('fa fa-credit-card')
+        $('.credit-card-type').find('img').remove()
+        $('.credit-card-type').append("<img src='{% static 'theme/images/american-express.png' %}' style='margin-top: -6px;margin-bottom: -6px;'></img>")
+    }
+    else if (card_type  == "visa")
+    {   
+        $('.credit-card-type').removeClass('fa fa-credit-card')
+        $('.credit-card-type').find('img').remove()
+        $('.credit-card-type').append("<img src='{% static 'theme/images/visa.png' %}' style='margin-top: -6px;margin-bottom: -6px;'></img>")
+    }
+    else if (card_type  == "mastercard")
+    { 
+        $('.credit-card-type').removeClass('fa fa-credit-card')
+        $('.credit-card-type').find('img').remove()
+        $('.credit-card-type').append("<img src='{% static 'theme/images/master-card.png' %}' style='margin-top: -6px;margin-bottom: -6px;'></img>")
+    }
+    else if (card_type  == "discover")
+    {
+        $('.credit-card-type').removeClass('fa fa-credit-card')
+        $('.credit-card-type').find('img').remove()
+        $('.credit-card-type').append("<img src='{% static 'theme/images/discover.png' %}' style='margin-top: -6px;margin-bottom: -6px;'></img>")
+    }
+    else if (card_type  == "jcb")
+    {
+        $('.credit-card-type').removeClass('fa fa-credit-card')
+        $('.credit-card-type').find('img').remove()
+        $('.credit-card-type').append("<img src='{% static 'theme/images/jcb.png' %}' style='margin-top: -6px;margin-bottom: -6px;'></img>")
+    }
+
+})
+</script>
+{% endblock other_scripts %}

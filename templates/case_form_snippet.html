@@ -1,0 +1,353 @@
+<style>
+    #adult-clients_tag[readonly="readonly"], #child-clients_tag[readonly="readonly"] {
+        display: none;
+    }
+</style>
+   
+
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Name <sup>*</sup></div>
+    <div class="col-sm-6 col-lg-6">
+        <input type="text" class="form-control" required name="case-name" value="{{ case.name }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Law Firm <sup>*</sup></div>
+    <div class="col-sm-6 col-lg-6">
+        <select name="law-firm" required id="" class="form-control mbot-15 law-firm-select">
+            {% for law_firm in law_firms %}
+            <option value="{{ law_firm.pk }}" {% if law_firm.pk == case.law_firm.pk %}selected{% endif %}>{{ law_firm.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>                 
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Client Name <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required type="text" name="client-name" class="form-control" value="{{ case.client_name  | safe }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Adult clients</div>
+    <div class="col-lg-6">
+        <input id="adult-clients" type="text" name="adult-clients" class="form-control tags" value="{{ case.adult_clients | safe }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Child clients</div>
+    <div class="col-lg-6">
+        <input id="child-clients" type="text" name="child-clients" class="form-control tags" value="{{case.child_clients | safe}}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Date of Loss of insurance (DOL) </div>
+    <div class="col-lg-6">
+        <input class="form-control form-control-inline input-medium default-date-picker" size="16" type="text" name="dol" value="{{ case.dol }}">
+    </div>
+</div>
+<div class="form-group">
+        <div class="col-sm-3 control-label col-lg-3">Expected Date of Closing </div>
+        <div class="col-lg-6">
+            <input class="form-control form-control-inline input-medium default-date-picker" size="16" type="text" name="edos" value="{{ case.expected_closing_date }}">
+        </div>
+    </div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of adult signatures required <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required type="number" min="0"  name="number-of-adult-signatures-required" class="form-control" value="{{ case.number_of_adult_signatures_required }}">
+    </div>
+</div>
+
+          
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of child signatures required <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required type="number" min="0" name="number-of-child-signatures-required" class="form-control" value="{{ case.number_of_child_signatures_required }}">
+    </div>
+</div>
+{% if case.is_signature_obtained and case.number_of_adult_signatures_obtained > 0 %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of adult signatures obtained <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required type="number" min="1" name="number-of-adult-signatures-obtained" class="form-control" value="{{ case.number_of_adult_signatures_obtained  }}">
+    </div>
+</div>
+{% else %}
+<div class="form-group">
+        <div class="col-sm-3 control-label col-lg-3">No. of adult signatures obtained <sup>*</sup></div>
+        <div class="col-lg-6">
+            <input required type="number" min="0" name="number-of-adult-signatures-obtained" class="form-control" value="{{ case.number_of_adult_signatures_obtained  }}">
+        </div>
+    </div>
+{% endif %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of child signatures obtained <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required type="number" min="0"  name="number-of-child-signatures-obtained" class="form-control" value="{{case.number_of_child_signatures_obtained}}">
+    </div>
+</div>          
+
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Client Language <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required type="text" name="language" class="form-control" value="{{ case.client_language }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Phone no. </div>
+    <div class="col-lg-6">
+                <a id="phone-number-one-link" href="tel:{{ client_mobile_phone }}">
+                        <input required name="mobile-phone" type="text" class="form-control" value="{{ case.client_mobile_phone }}">
+                    </a>
+        
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Home phone no.</div>
+    <div class="col-lg-6">
+        {% if case.client_home_phone %}
+         <a id="phone-number-two-link" href="tel:{{ client_home_phone }}">
+                <input name="home-phone" type="text" class="form-control" value="{{ case.client_home_phone }}">
+         </a>
+         {% else %}
+         <input name="home-phone" type="text" class="form-control" value="{{ case.client_home_phone }}">
+         {% endif %}
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Email address (primary) </div>
+    <div class="col-lg-6">
+        <input  name="primary-email" type="email" class="form-control" value="{{ case.client_primary_email }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Email address (secondary)</div>
+    <div class="col-lg-6">
+        <input name="secondary-email" type="email" class="form-control" value="{{ case.client_secondary_email }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Address line 1 <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required name="street-1" type="text" class="form-control" value="{{ case.client_address.street_one }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Address line 2</div>
+    <div class="col-lg-6">
+        <input name="street-2" type="text" class="form-control" value="{{ case.client_address.street_two }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">City <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required name="city" type="text" class="form-control" value="{{ case.client_address.city }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">State <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input required name="state" type="text" class="form-control" value="{{ case.client_address.state }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Country <sup>*</sup></div>
+    <div class="col-lg-6">
+        <select name="country" required id="country-select" class="form-control mbot-15 country-select-dropdown">
+            {% for country in countries %}
+            <option value="{{ country }}">{{ country }}</option>
+            {% endfor %}
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">ZIP code</div>
+    <div class="col-lg-6">
+        <input name="zip-code" type="text" class="form-control" value="{{ case.client_address.zip_code }}">
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Locality</div>
+    <div class="col-lg-6">
+        <select name="locality" id="" class="form-control mbot-15">
+            <option value="In Area" {% if case.locality == "In Area" %}selected{% endif %}>In Area</option>
+            <option value="Out of Area" {% if case.locality == "Out of Area" %}selected{% endif %}>Out of Area</option>
+        </select>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Case type</div>
+    <div class="col-lg-6">
+        <select name="case-type" id="case-type" class="form-control mbot-15">
+            <option value="default" {% if case.type == "default" %}selected{% endif %}>Default</option>
+            <option value="Auto V. Auto" {% if case.type == "Auto V. Auto" %}selected{% endif %}>Auto V. Auto</option>
+            <option value="Auto V. Pedestrian" {% if case.type == "Auto V. Pedestrian" %}selected{% endif %}>Auto V. Pedestrian</option>
+            <option value="Auto V. Bicycle" {% if case.type == "Auto V. Bicycle" %}selected{% endif %}>Auto V. Bicycle</option>
+            <option value="Premises Liability" {% if case.type == "Premises Liability" %}selected{% endif %}>Premises Liability</option>
+            <option value="Dog Bite" {% if case.type == "Dog Bite" %}selected{% endif %}>Dog Bite</option>
+            <option value="Others" {% if case.type == "Others" %}selected{% endif %}>Others</option>
+        </select>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Case Description (Only if type is Others)</div>
+    <div class="col-lg-6">
+        <input type="text" {% if case.type != "Others" %}disabled="disabled"{% endif %} name="case-type-description" id="case-type-description" class="form-control mbot-15" maxlength="200" placeholder="" value="{{case.type_description}}"></input>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-xs-6 col-sm-3 control-label col-lg-3"> Attched Documents</div>
+    <div class="col-xs-6 col-lg-6">
+        <div class="form-control" style="border: none;height: auto;">
+            <div class="file-holder">
+                {% for attached_document in attached_documents %}
+                <div>
+                {{ attached_document.document.file_name }}<button class="btn btn-clear btn-sm delete-document" type="button" style="margin-left:10px;background: lightgray;    margin-top: -5px;float:right;" href="#" attached-document-id="{{ attached_document.pk }}"><i class="fa fa-trash-o"></i></button> <button class="btn btn-clear btn-sm download-document" type="button" style="margin-left:10px;background: lightgray;    margin-top: -5px;float:right;" href="#" document-id="{{ attached_document.document.pk }}"><i class="fa fa-download" aria-hidden="true"></i></button>  <button style="margin-left:10px;margin-bottom: 5px;margin-top:-5px;float:right;"class="btn btn-primary btn-sm document-print" target="_blank" type="button" document-id="{{ attached_document.document.pk }}"aria-expanded="false"><i class="fa fa-external-link" aria-hidden="true"></i></button> 
+            </div>
+                <br>
+                    {% endfor %}
+            </div>
+            <div class="document-holder">
+                {% for document in documents %}
+                    <input type="checkbox" name="document" value={{document.pk}}> {{document.file_name}}</input><br>
+                {% endfor  %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+        <div class="col-sm-3 control-label col-lg-3">Date of Signup <sup>*</sup></div>
+        <div class="col-lg-6">
+            <input class="form-control form-control-inline input-medium default-date-picker" required size="16" type="text" name="dos" value="{{ case.date_of_signup }}">
+        </div>
+    </div>
+{% if case.status == "Closed" %}
+<div class="form-group">
+        <div class="col-sm-3 control-label col-lg-3">Closing Date<sup>*</sup></div>
+        <div class="col-lg-6">
+            <input class="form-control form-control-inline input-medium default-date-picker" required size="16" type="text" name="closing-date" value="{{ case.closing_date }}">
+        </div>
+    </div>
+{% else %}    
+{% endif %}    
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Basic Fee (Law Firm) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="basic-fee-for-case-law-firm" class="form-control" value="{{ case.basic_fee_law_firm }}">
+    </div>
+</div>
+{% if not case.is_investigator_paid %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Basic Fee (Investigator) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="basic-fee-for-case-investigator" class="form-control" value="{{ case.basic_fee_investigator }}">
+    </div>
+</div>
+{% else %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Basic Fee (Investigator) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="hidden" name="basic-fee-for-case-investigator" value="{{ case.basic_fee_investigator }}">
+        <div class="form-control" style="border: none;">{{ case.basic_fee_investigator }}</div>
+    </div>
+</div>
+{% endif %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of free miles (Law Firm) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="no-of-free-miles-law-firm" class="form-control" value="{{ case.no_of_free_miles_law_firm }}">
+    </div>
+</div>
+{% if not case.is_investigator_paid %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of free miles (Investigator) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="no-of-free-miles-investigator" class="form-control" value="{{ case.no_of_free_miles_investigator }}">
+    </div>
+</div>
+{% else %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of free miles (Investigator) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="hidden" name="no-of-free-miles-investigator" value="{{ case.no_of_free_miles_investigator }}">
+        <div class="form-control" style="border: none;">{{ case.no_of_free_miles_investigator }}</div>
+    </div>
+</div>
+{% endif %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Mileage rate (Law Firm) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="mileage-rate-law-firm" class="form-control" value="{{ case.mileage_rate_law_firm }}">
+    </div>
+</div>
+{% if not case.is_investigator_paid %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Mileage rate (Investigator) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="mileage-rate-investigator" class="form-control" value="{{ case.mileage_rate_investigator }}">
+    </div>
+</div>
+{% else %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Mileage rate (Investigator) <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="hidden" name="mileage-rate-investigator" value="{{ case.mileage_rate_investigator }}">
+        <div class="form-control" style="border: none;">{{ case.mileage_rate_investigator }}</div>
+    </div>
+</div>
+{% endif %}
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">No. of miles travelled</div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="no-of-miles-travelled" class="form-control" value="{{ case.no_of_miles_travelled }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Additional expenses by investigator</div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="additional-expenses" class="form-control" value="{{ case.additional_expenses }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Additional expenses description</div>
+    <div class="col-lg-6">
+        <input type="text" name="additional-expenses-description" class="form-control" value="{{ case.additional_expenses_description }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">RSN extra expenses</div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="rsn-extra-expenses" class="form-control" value="{{ case.rsn_extra_expenses }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">RSN extra expenses description</div>
+    <div class="col-lg-6">
+        <input type="text" name="rsn-extra-expenses-description" class="form-control" value="{{ case.rsn_extra_expenses_description }}">
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Expected payment <sup>*</sup></div>
+    <div class="col-lg-6">
+        <input type="number" min="0" name="expected-payment-for-case" class="form-control" value="{{ case.expected_payment }}">
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Total payment to Investigator</div>
+    <div class="col-lg-6">
+        <div class="form-control" style="border: none;">$ {{ amount_paid_to_investigator }} {% if not case.is_investigator_paid %}(Subject to change until the case is closed){% endif %}</div>
+    </div>
+</div>
+<div class="form-group">
+    <div class="col-sm-3 control-label col-lg-3">Total Law Firm payout</div>
+    <div class="col-lg-6">
+        <div class="form-control" style="border: none;">$ {{ amount_billed_to_law_firm }}</div>
+    </div>
+</div>
+
+{% if case_result %}<div name="extra-params" id="extra-params" data-case-result="{{case_result}}"/>{% endif %}

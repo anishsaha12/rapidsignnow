@@ -1,0 +1,71 @@
+.arc text{
+    font:19px;
+    font-weight: 700;
+    text-anchor: middle;
+    color: white;
+}
+.arc path{
+    stroke: #fff;
+}
+/* body{
+    background: whitesmoke;
+    font-family: Arial, Helvetica, sans-serif;
+} */
+.arc2 text{
+    font:10px;
+    color: white;
+    text-anchor: middle;
+}
+.arc2 path{
+    stroke: #fff;
+} 
+#colorPanel{
+    width:300px;
+    height:auto;
+     
+    float: right; 
+    margin-right: 500px;
+  }
+  .first{
+    width:20px;
+    height:20px;
+    border:1px solid black;
+    border-radius:3px;
+      margin-top:10px;
+      background: #e25144;
+      text-align: right;
+  }
+  .s{
+    background: rgb(232, 139, 92);
+  } 
+  /* .t{
+    background:rgb(247, 191, 113);
+  }
+  .f{
+    background:#e8bb9b;
+  } */
+  .fi{
+    background:#c2e8e4;
+  }
+  .six{
+    background:#e5e099;
+  }
+  .sev{
+    background:#ed855c;
+  }
+  .eig{
+    background:#c5edb6;
+  }
+  .nine{
+    background:#ebed74;
+  }
+  .ten{
+    background:rgb(139, 229, 156);
+  }
+  #one{
+    margin-left: 30px;
+  }
+  #user{
+    margin-top: 30px;
+    margin-left: 100px;
+  }

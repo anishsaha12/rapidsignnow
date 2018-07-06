@@ -1,0 +1,92 @@
+.button-holder {
+  text-align: center; }
+
+button {
+  display: inline-block;
+  vertical-align: middle;
+  padding: 5px 10px;
+  margin-right: 7px;
+  color: white;
+  border-radius: 3px;
+  outline: none;
+  box-shadow: none;
+  border: none; }
+  button.success {
+    background-color: #a9d86e;
+    border-color: #a9d86e; }
+  button.failure {
+    background-color: #ff6e61;
+    border-color: #ff6e61; }
+
+.form-group div {
+  word-break: break-all; }
+
+.case-card {
+  text-align: center; }
+  .case-card a {
+    color: #0070e0; }
+
+.panel-central-heading {
+  font-size: 1.4em;
+  font-weight: bold; }
+
+.client-info {
+  margin-top: 15px; }
+
+.working-case-buttons {
+  margin: 20px auto;
+  width: 80%;
+  margin-top: 30px; }
+  .working-case-buttons button {
+    margin-bottom: 20px; }
+
+.swal2-modal .swal2-radio label:not(:first-child) {
+  margin-left: 0px; }
+
+.swal2-radio label {
+  display: block;
+  padding-left: 10%;
+  text-align: left;
+  margin-bottom: 10px;
+  font-size: 1.3em;
+  font-weight: normal; }
+  .swal2-radio label input[type=radio] {
+    position: relative;
+    top: 3px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border: 1px solid black;
+    width: 18px;
+    height: 18px !important;
+    border-radius: 50% !important;
+    padding: 2px;
+    margin-right: 10px;
+    vertical-align: top; }
+  .swal2-radio label input[type=radio]:checked {
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 255, 255, 0.6);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(255, 255, 255, 0.6); }
+  .swal2-radio label input[type=radio]:checked:after {
+    content: "";
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 10px;
+    height: 10px; }
+
+.timeline:before {
+  bottom: 70px; }
+
+.change-status-panel {
+  font-size: 1.2em; }
+  .change-status-panel label {
+    width: 80%; }
+
+.tab-target {
+  display: none; }
+  .tab-target.show {
+    display: block; }
+
+/*# sourceMappingURL=style.css.map */

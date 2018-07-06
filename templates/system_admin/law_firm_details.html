@@ -1,0 +1,654 @@
+{% extends 'system_admin/base.html' %} {% load staticfiles %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" /> 
+{% endblock theme_styles %} 
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}"> 
+
+<style>
+    .country-select-dropdown {
+        padding: 0;
+    }
+    
+    .country-select-dropdown[disabled] {
+        padding: 6px 12px;
+    }
+    
+    .country-select-dropdown > .select2-choice {
+        height: 100%;
+    }
+    .btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-width: 100%;
+    min-height: 100%;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+.add-file{
+    border-radius: 5px;
+}
+input[type=file]{
+    display: inline;
+}
+#upload-button{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    width: 100%;
+
+    }
+</style>
+{% endblock other_styles %} 
+
+{% load range_filter %} 
+
+{% block content %}
+
+<form action="." method="post" class="form-horizontal bucket-form" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Law Firm Details
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                    <span class="pull-right panel-buttons">
+                         {% if law_firm.is_active %}
+                         <button type="button" class="btn btn-warning">Suspend</button>
+                         {% else %}
+                         <button type="button" class="btn btn-success resume">Resume</button>
+                         <button type="button" class="btn btn-danger">Delete</button>
+                         {% endif %}
+                     </span>
+                </header>
+                <div class="panel-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Name of Law Firm <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="name" type="text" class="form-control" value="{{ law_firm.name }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 1 <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <a id="phone-number-one-link" href="tel:{{ phone_number_one }}">
+                                    <input required name="phone-1" type="text" class="form-control" value="{{ law_firm.phone_number_one }}"></a>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 2</div>
+                        <div class="col-lg-6">
+                                {% if phone_number_two %}
+                            <a id="phone-number-two-link" href="tel:{{ phone_number_two }}"><input  name="phone-2" type="text" class="form-control" value="{{ law_firm.phone_number_two }}"></a>
+                            {% else %}
+                            <input  name="phone-2" type="text" class="form-control" value="{{ law_firm.phone_number_two }}">
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 1 <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="email-1" type="email" class="form-control" value="{{ law_firm.email_one }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 2</div>
+                        <div class="col-lg-6">
+                            <input name="email-2" type="email" class="form-control" value="{{ law_firm.email_two }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Payment Plan</div>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="payment-plan" class="form-control mbot-15 payment-plan">
+                                    <option name="daily" value="daily">Daily</option>
+                                    <option name="monthly" value="monthly">Monthly</option>
+                                </select>
+                            </div>      
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1 <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="street-1" type="text" class="form-control" value="{{ law_firm.address.street_one }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="street-2" type="text" class="form-control" value="{{ law_firm.address.street_two }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="city" type="text" class="form-control" value="{{ law_firm.address.city }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="state" type="text" class="form-control" value="{{ law_firm.address.state }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Country <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <select name="country" required id="" class="form-control mbot-15 country-select-dropdown">
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="zip-code" type="text" class="form-control" value="{{ law_firm.address.zip_code }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Number of free miles</div>
+                        <div class="col-lg-6">
+                            <input name="number-of-free-miles" type="number" min="0" class="form-control" value="{{ law_firm.number_of_free_miles }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <div class="col-xs-6 col-sm-3 control-label col-lg-3">Documents</div>
+                                <div class="col-xs-6 col-lg-6 files">
+                                    {% if documents %}
+                                    <span>
+                                    {% for document in documents  %}
+                                    <div id="document-container">
+                                     {{ document.file_name }}  <button class="btn btn-clear btn-sm delete-document" style="margin-left:10px;background: lightgray;    margin-top: -5px;float:right;" type="button" document-id="{{ document.pk }}" law-firm-id = "{{law_firm.pk}}" ><i class="fa fa-trash-o"></i></button><button class="btn btn-clear btn-sm edit-document" style="margin-left:10px;background: lightgray;    margin-top: -5px;float:right;" href="#" document-id="{{ document.pk }}"><i class="fa fa-pencil"></i></button><button class="btn btn-clear btn-sm download-document" type="button" style="margin-left:10px;background: lightgray;    margin-top: -5px;float:right;" href="#" document-id="{{ document.pk }}"><i class="fa fa-download" aria-hidden="true"></i></button> <button style="margin-left:10px;margin-bottom: 5px;float:right;margin-top:-5px;"class="btn btn-primary btn-sm document-print" target="_blank" type="button" document-id="{{ document.pk }}"aria-expanded="false"><i class="fa fa-external-link" aria-hidden="true"></i></button>
+                                    </div>
+                                     <br>
+                                    {% endfor  %} 
+                                </span>
+                                    
+                                
+                                {% else %}
+                                
+                                {% endif %}
+                                <br>
+                                <div class="col-xs-6 col-lg-6 button-container">
+                                    </div>
+                                <br><br>
+                                <ul class="fileList"></ul>
+                                
+                                </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Rates
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                {% include 'system_admin/law_firm_rates_snippet.html' %}
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-buttons">
+                <button type="button" class="btn btn-success">Edit</button>
+                <button type="submit" class="btn btn-info">Update</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+<script src="{% static 'common/js/jquery.inputmask.bundle.min.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+    $('#navigation-button').html('<i class="fa fa-chevron-left"></i> Back');
+    $('#navigation-button').click(function () {
+        location.assign('/administrator/law-firms/');
+    });
+    
+    $.validator.addMethod('phone', function (value) {
+        if (value == '') {
+            return true;
+        }
+        
+        return /^\+\d \d\d\d\-\d\d\d\-\d\d\d\d$/.test(value); 
+    }, 'Please enter a valid phone number.');
+    
+    $('form').validate({
+        rules: {
+            'phone-1': {
+                phone: true
+            },
+            'phone-2': {
+                phone: true
+            }
+        }
+    });
+    
+    $('input[name*=phone]').inputmask('+9 999-999-9999');
+    $('a[data-nav-item=law-firms]').addClass('active');
+    // $('input[type=file]').attr('disabled','disabled');
+    $('input, textarea').attr('readonly', 'readonly');
+    $('.btn-file').hide()
+    $('.add-file').hide()
+    $('#uploaded-documents').css('display','none')
+    
+    $('.delete-document').hide()
+    // $('.edit-document').hide()
+    $('select').attr('disabled', 'disabled');
+    
+    $('select[name=country]').val('{{ law_firm.address.country }}');
+    $('select[name=payment-plan]').val('{{law_firm.payment_plan}}')
+
+    $('.form-buttons').one('click', function() {
+        // FileUploadButton = $("<span class='btn btn-default btn-file'>\
+        //         +Add Files<input type='file' id='files1' name='document' accept='.pdf, .docx, .doc, .txt' multiple/>\
+        //         </span>") 
+        $('.delete-document').show()
+        $("#phone-number-two-link").removeAttr("href")
+        $("#phone-number-one-link").removeAttr("href")
+        // $('.edit-document').show()
+        $(this).toggleClass('editing');
+        $('input, textarea').removeAttr('readonly');
+        $('select').removeAttr('disabled');
+        $('input[type=file]').removeAttr('disabled',false);
+        $('.add-file').show()
+        $('.rating').toggleClass('fixed');
+        $('.fileupload .btn').toggleClass('editing');
+
+    });
+         
+    $('.country-select-dropdown').select2({
+        width: '100%',
+        disabled: true
+    });
+    
+    $('.btn-warning').click(function () {
+        'use strict';
+        swal({
+            title: 'Suspend Account', 
+            text: 'Are you sure?', 
+            type: 'question',
+            confirmButtonText: 'Yes',
+            showCancelButton: true,
+            cancelButtonText: 'No'
+        }).then(function () {
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                context: 'suspend'
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'The law firm has been suspended',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+        
+        return false;
+        
+    });
+    
+    $('.btn-success.resume').click(function () {
+        'use strict';
+        swal({
+            title: 'Resume Account', 
+            text: 'Are you sure?', 
+            type: 'question',
+            confirmButtonText: 'Yes',
+            showCancelButton: true,
+            cancelButtonText: 'No'
+        }).then(function () {
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                context: 'resume'
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'The law firm has been resumed',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+        
+        return false;
+        
+    });
+    
+    $('.btn-danger').click(function () {
+        'use strict';
+        swal({
+            title: 'Delete Account', 
+            text: 'Are you sure?', 
+            type: 'question',
+            confirmButtonText: 'Yes',
+            showCancelButton: true,
+            cancelButtonText: 'No'
+        }).then(function () {
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                context: 'delete'
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'The law firm has been deleted',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                
+                setTimeout(function () {
+                    location.assign('/administrator/law-firms/');
+                }, 2000);
+            });
+        });
+        
+        return false;
+        
+    });
+    // $.fn.fileUploader = function (filesToUpload) {
+    //     debugger
+    //     this.closest(".files").change(function (evt) {
+
+    //     for (var i = 0; i < evt.target.files.length; i++) {
+    //         filesToUpload.push(evt.target.files[i]);
+    //     };
+    //     var output = [];
+
+    //     for (var i = 0, f; f = evt.target.files[i]; i++) {
+    //         var removeLink = "<a class=\"removeFile\" href=\"#\" data-fileid=\"" + i + "\"><i class='fa fa-times-circle' aria-hidden='true'></i></a>";
+
+    //         output.push("<li style='width: max-content;'><strong>", escape(f.name), "</strong> - ",
+    //             f.size, " bytes. &nbsp; &nbsp; ", removeLink, "</li> ");
+    //     }
+
+    //             $(this).children(".fileList")
+    //                 .append(output.join(""));   
+    //         });
+    //     };
+
+    //     var filesToUpload = [];
+
+    //     $(document).on("click",".removeFile", function(e){
+    //         e.preventDefault();
+    //         var fileName = $(this).parent().children("strong").text();
+            
+    //         for(i = 0; i < filesToUpload.length; ++ i){
+    //             if(filesToUpload[i].name == fileName){
+            
+    //                 filesToUpload.splice(i, 1);    
+    //             }	
+    //         }
+    //         $(this).parent().remove();
+    //     });
+
+    //     $("#files1").fileUploader(filesToUpload);
+
+    (function(){
+        
+            var form = $('.button-container');
+            fileSerialNumber = 1;
+            var addFileInputBtn = $('<button class="add-file">Add file</button>')
+            addFileInputBtn.hide()
+        
+            form.append(addFileInputBtn);
+        
+        
+            addFileInputBtn.click(function(event){
+              event.preventDefault();
+              addFileInputBtn.text("+Add anoother file")
+              var fileBoxContainer = $('<div class="fileBoxContainer" style="width: max-content;"/>')
+              var fileNameLabel = $('<label for="namefile'+fileSerialNumber+'"style="margin-left: 40px;"> Name: </label>');
+              var fileName = $('<input name="document-name" type="text" style="border-radius:3px;border:1px solid #e2e2e4;"></input>');
+              var rmButton = $('<button style="background:transparent;border:none;"><i class="fa fa-times-circle" aria-hidden="true"></button>');
+              var fileInput = $('<input name="document" type="file"></input>')
+            //   var fileInputSpan = $('<span class="btn btn-default btn-file">Choose</span>')
+            //   fileInputSpan.append(fileInput)
+              fileBoxContainer.append(fileInput);
+              fileBoxContainer.append(fileNameLabel);
+              fileBoxContainer.append(fileName);
+              fileBoxContainer.append(rmButton);
+              form.append(fileBoxContainer);
+              
+              fileInput.on('change',function () {
+              var fName= this.value
+              fName = fName.replace(/.*[\/\\]/, '');
+              fName = fName.substring(fName.lastIndexOf('/')+1, fName.lastIndexOf('.'));
+              fileName.val(fName);
+                }
+              ) ;
+              
+              
+              rmButton.click(function(event){
+                event.preventDefault();
+                fileBoxContainer.remove();
+              });
+              
+              
+            fileSerialNumber+=1;
+            });
+          }
+        )()
+
+
+        $('.delete-document').click(function (event) {
+            event.preventDefault()
+            var document_id = $(this).attr('document-id');
+            var law_firm_id = $(this).attr('law-firm-id');
+            var attached_cases = ''
+            
+            
+            {% for attached_doc in attached_documents %}
+                if ( {{attached_doc.document.pk}} == document_id)
+                {
+                    attached_cases = attached_cases + '<li>' + '{{attached_doc.case.name}}' + '</li>'
+                }
+            {% endfor %}
+            
+            
+
+            debugger
+            if (attached_cases == '')
+            {
+                attached_cases = 'None'
+            }
+            swal({
+                title: 'Delete',
+                text: 'Are you sure you want delete this document? <br> Cases attached are : <br><br>' + attached_cases,
+                type: 'warning',
+                confirmButtonText: 'Yes',
+                showCancelButton: true,
+                cancelButtonText: 'No'
+            }).then(
+                function () {
+
+
+                    var form = $('<form action="/administrator/delete-document/" method="POST" >\
+                        <input name="csrfmiddlewaretoken" value='+ $('input[name=csrfmiddlewaretoken]').val() +' type="hidden"/>\
+                        <input name="document_id" value='+document_id+' type="hidden"/>\
+                    <input name="law_firm_id" value='+law_firm_id+' type="hidden" /></form>');
+                    form.appendTo('body').submit();
+            })
+     });
+     $('.document-print').click(function(event){
+        //  event.preventDefault()
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST" target="_blank"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'view-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+
+
+     $('.edit-document').click(function(event){
+         event.preventDefault()
+         $(".fileBoxContainer").remove()       
+        var document_id = $(this).attr('document-id');
+        var documentContainer = $(this).parent('#document-container')
+        var fileBoxContainer = $('<div class="fileBoxContainer" style="width: max-content;"/>')
+              var fileNameLabel = $('<label for="namefile"style=""> Name: </label>');
+              var fileName = $('<input name="new-document-name" type="text" style="border-radius:3px;border:1px solid #e2e2e4;"></input>');
+            //   var rmButton = $('<button style="background:transparent;border:none;"><i class="fa fa-times-circle" aria-hidden="true"></button>');
+              var fileInput = $('<br><input name="new-document" type="file"></input>')
+              var update = $('<button type="button" id="update-document" style="background:#55b6ad;color:#ffffff; margin-left:10px;border: 1px;">Update</button>') 
+            //   var fileInputSpan = $('<span class="btn btn-default btn-file">Choose</span>')
+            //   fileInputSpan.append(fileInput)
+              fileBoxContainer.append(fileInput);
+              fileBoxContainer.append(fileNameLabel);
+              fileBoxContainer.append(fileName);
+              fileBoxContainer.append(update);
+              documentContainer.append(fileBoxContainer)
+              fileInput.on('change',function () {
+              var fName= this.value
+              fName = fName.replace(/.*[\/\\]/, '');
+              fName = fName.substring(fName.lastIndexOf('/')+1, fName.lastIndexOf('.'));
+              fileName.val(fName);
+                }
+              ) ;
+              
+              
+              update.click(function(event){
+                    $('<form action="." method="POST" enctype="multipart/form-data"></form>')
+                .append($('<input>', {
+                    'name': 'csrfmiddlewaretoken',
+                    'value': $('input[name=csrfmiddlewaretoken]').val(),
+                    'type': 'hidden'
+                }))
+                .append($('<input>', {
+                    'name': 'context',
+                    'value':  'edit-document',
+                    'type': 'hidden'
+                })).append($('<input>', {
+                    'name': 'document-id',
+                    'value': document_id,
+                    'type': 'hidden'
+                })).append(fileBoxContainer)
+                .appendTo('body').submit();
+                    
+                        
+                })
+     })
+
+     $('.download-document').click(function () {
+        //  debugger
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'download-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+// this function is used for printing ascii characters
+</script>
+{% endblock other_scripts %}

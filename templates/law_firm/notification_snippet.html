@@ -1,0 +1,25 @@
+{% if notifications %}
+    {% for notification in notifications.entries %}
+        {% if notification.type == 'status' %}
+            <li class="notification-element {% if notification.read %}read{% endif %}">
+                <div class="alert alert-info clearfix">
+                    <div class="noti-info" data-status-id="{{ notification.status_id }}">
+                        <a href="/law-firm/case-details/{{ notification.case_id }}/"> {{ notification.updated_by }} changed the status of {{ notification.case_name }} to {{ notification.status }}</a>
+                    </div>
+                </div>
+            </li>
+        {% elif notification.type == 'acceptance' %}
+            <li class="notification-element {% if notification.read %}read{% endif %}">
+                <div class="alert {% if notification.is_accepted %}alert-success{% else %}alert-danger{% endif %} clearfix">
+                    <div class="noti-info" data-acceptance-id="{{ notification.acceptance_id }}">
+                        <a href="/law-firm/case-details/{{ notification.case_id }}/"> {{ notification.updated_by }} {% if notification.is_accepted %}accepted{% else %}declined{% endif %} the case {{ notification.case_name }}</a>
+                    </div>
+                </div>
+            </li>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <li>
+        <p>No Notifications</p>
+    </li>
+{% endif %}

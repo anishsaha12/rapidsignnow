@@ -1,0 +1,15 @@
+#tooltip-for-map-data {	
+    position: absolute;			
+    text-align: center;			
+    /* width: 60px;					 */
+    /* height: 28px;					 */
+    padding: 2px;				
+    /* font: 12px sans-serif;		 */
+    background: #3b3737;	
+    border: 0px;		
+    border-radius: 12px;			
+    pointer-events: none;	
+    color: white;
+    display: none;
+    font-size:15px 
+}

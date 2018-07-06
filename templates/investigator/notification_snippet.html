@@ -1,0 +1,18 @@
+{% if notifications %}
+    <li>
+        <p>Notifications</p>
+    </li>
+    {% for notification in notifications.entries %}
+        <li class="notification-element {% if notification.read %}read{% endif %}">
+            <div class="alert alert-info clearfix">
+                <div class="noti-info" data-status-id="{{ notification.status_id }}">
+                    <a href="/investigator/case-details/{{ notification.case_id }}/"> {{ notification.broker }} changed the status of {{ notification.case_name }} to {{ notification.status }}</a>
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+{% else %}
+    <li>
+        <p>No Notifications</p>
+    </li>
+{% endif %}

@@ -1,0 +1,473 @@
+{% extends 'investigator/base.html' %}
+
+{% load staticfiles %}
+
+{% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet">   
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet" >
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+{% endblock theme_styles %}
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'investigator/css/style.css' %}">
+
+<style>
+    
+#move-to-status-panel-button {
+  /* display: none; */
+  position: fixed;
+  bottom: 27px;
+  right: 20px;
+  z-index: 99;
+  font-size: 10px;
+  font-weight: 700;
+  border: none;
+  outline: none;
+  background-color: #1fb5aeab;
+  color: white;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.mark {
+    background: transparent;
+    
+}
+.unmark {
+    background: transparent;
+    
+}
+
+</style>
+{% endblock other_styles %}
+
+{% load range_filter %}
+
+{% block content %}
+
+
+<div class="tab-target show" data-target-value="case-details">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                        {% if not is_case_closed %}
+                    <span id="case-details-heading">Click Here for More Case Details</span>
+                    <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-up"></a>
+                         </span>
+                    {% else %}
+                    <span id="case-details-heading">Click Here for Less Case Details</span>
+                    <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-up"></a>
+                         </span>
+                    {% endif %}
+                    
+                     <span class="pull-right panel-buttons">
+                            {% if not case.is_attention_required %}
+                            <button type="button" class="btn btn-danger mark-case-btn" id="mark-case" case-id= "{{case.pk}}">Mark Case <i class="fa fa-exclamation-triangle fa-lg mark" aria-hidden="true"></i></button>
+                            {% else %}
+                            <button type="button" class="btn btn-success unmark-case-btn" id="unmark-case" case-id= "{{case.pk}}">Unmark Case <i class="fa fa-exclamation-triangle fa-lg unmark" aria-hidden="true"></i></button>
+                            {% endif %}
+                     </span>
+                </header>
+                {% if not is_case_closed %}
+                <div class="panel-body" style="display:none">
+                {% else %}
+                <div class="panel-body">
+                {% endif %}
+                    <form action="." method="post" class="form-horizontal bucket-form">
+                        {% csrf_token %}
+                        {% include 'investigator/case_form_snippet_investigator.html' %}
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-sm-12">
+        </div>
+    </div>
+</div>
+{% if not is_case_closed %}
+<button id="move-to-status-panel-button" title="Change case status">Change Status >></button>
+<div class="tab-target show" data-target-value="change-status" id="case-status">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Case Status
+                    
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body change-status-panel">
+                    <form action="." method="post" class="form-horizontal bucket-form">
+                        {% csrf_token %}
+
+                        <div class="form-group">
+                            <div class="icheck minimal" style="padding: 5px 10px;">
+                                <div class="radio single-row">
+                                    <input id="inactive" tabindex="3" type="radio"  name="case-status-radio" value="inactive" checked>
+                                    <label for="inactive">Inactive</label>
+                                    <br><br>
+                                </div>
+                                <div class="radio single-row">
+                                    <input id="in-progress" tabindex="3" type="radio"  name="case-status-radio" value="in-progress">
+                                    <label for="in-progress">In progress</label>
+                                    <br><br>
+                                </div>
+                                
+                                <div class="radio single-row">
+                                        <input id="called-and-texted" tabindex="3" type="radio"  name="case-status-radio" value="called-and-texted">
+                                        <label for="called-and-texted">Called and Texted</label>
+                                        <br><br>
+                                    </div>
+                                <div class="radio single-row">
+                                    <input id="client-contacted" tabindex="3" type="radio"  name="case-status-radio" value="client-contacted">
+                                    <label for="client-contacted">Client contacted</label>
+                                    <br><br>
+                                </div>
+                                <div class="radio single-row">
+                                    <input id="client-meeting-set" tabindex="3" type="radio"  name="case-status-radio" value="client-meeting-set">
+                                    <label for="client-meeting-set">Client meeting set</label>
+                                    <br><br>
+                                </div>
+                                
+                                <div class="radio single-row">
+                                        <input id="client-rescheduled" tabindex="3" type="radio"  name="case-status-radio" value="client-rescheduled">
+                                        <label for="client-rescheduled">Client reschedule time and/or place</label>
+                                        <br><br>
+                                </div>
+                                <div class="radio single-row">
+                                    <input id="client-cancelled" tabindex="3" type="radio"  name="case-status-radio" value="client-cancelled">
+                                    <label for="client-cancelled">Client cancelled </label>
+                                    <br><br>
+                                </div>
+                                <div class="radio single-row">
+                                    <input id="signature-obtained" tabindex="3" type="radio"  name="case-status-radio" value="signature-obtained">
+                                    <label for="signature-obtained">Signature obtained</label>
+                                    <br><br>
+                                </div>
+                                <div class="radio single-row">
+                                    <input id="signature-not-obtained" tabindex="3" type="radio"  name="case-status-radio" value="signature-not-obtained">
+                                    <label for="signature-not-obtained">Signature NOT obtained</label>
+                                    <br><br>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="form-buttons editing" style="margin-top: 20px;">
+                        <button type="button" class="btn btn-info" id="updateStatusBtn">Update Status</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+<div class="tab-target show" data-target-value="timeline">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="timeline">
+                <article class="timeline-item alt">
+                    <div class="text-right">
+                        <div class="time-show first">
+                            <a class="btn btn-primary">Today</a>
+                        </div>
+                    </div>
+                </article>
+                {% for status_change in status_updates %}
+                <article class="timeline-item {% if forloop.counter|divisibleby:2 %}alt{% endif %}">
+                    <div class="timeline-desk">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <span class="arrow-alt"></span>
+
+                                <span class="timeline-icon red">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                                <span class="timeline-date"></span>
+                                <h1 class="red">
+                                    {{ status_change.timestamp |date:"D d F Y  h:i A" }}
+                                </h1>
+                                <p>{{ status_change.status }} {% if status_change.extra_info %} <i class="fa fa-info-circle extra-info-holder" data-stringified-info="{{ status_change.extra_info }}"></i> {% endif %} ({{ status_change.user.first_name }} {{ status_change.user.last_name }})</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+
+{% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+<script src="/static/theme/js/jquery-tags-input/jquery.tagsinput.js"></script>
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %}
+
+{% block other_scripts %}
+<script>
+    var case_id = Number.parseInt("{{ case.pk }}"), case_status = '{{ case.status }}', law_firm_id = Number.parseInt("{{ case.law_firm.pk }}");
+    var no_of_adult_signatures_required = "{{ case.number_of_adult_signatures_required }}", no_of_child_signatures_required = "{{case.number_of_child_signatures_required}}";
+    case_status = case_status.toLocaleLowerCase();
+    case_status = case_status.split(' ').join('-');
+    $('input[name="case-status-radio"][value="' + case_status + '"]').prop('checked', true);
+    $('select[name="law-firm"]').val(law_firm_id);
+    $('select[name="country"]').val('{{ case.client_address.country }}');
+    $('select[name="locality"]').val('{{ case.locality }}');
+    
+    $('#adult-clients').tagsInput({
+        width:'auto',
+        defaultText: 'Add client'
+    });
+    $('#child-clients').tagsInput({
+        width:'auto',
+        defaultText: 'Add client'
+    });
+    
+    
+    $('input[name=dol]').datepicker();
+    $('input[name=dol]').datepicker('setDate', '{{ case.dol | date:"m/d/y" }}');
+    $('input[name=dol]').datepicker();
+    $('input[name=dol]').datepicker('setDate', '{{ case.dol | date:"m/d/o" }}');
+    $('input[name=dos]').datepicker('setDate', '{{ case.closing_date | date:"m/d/o" }}');
+
+
+    function initTagsInput(ele){
+        debugger;
+        $(ele).tagsInput({
+        width:'auto',
+        defaultText: 'Add names'
+    });
+    }
+</script>
+<script src="{% static 'investigator/js/details.js' %}"></script>
+<script>
+    $('#navigation-button').html('<i class="fa fa-chevron-left"></i> Back');
+    $('#navigation-button').click(function () {
+        window.history.back();
+    });
+    
+    $('input:not(.swal2-input), textarea:not(.swal2-input)').attr('readonly', 'readonly');
+    $('select').attr('disabled', 'disabled');
+
+    $('.download-document').click(function () {
+        //  debugger
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'download-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+     $('.document-print').click(function(event){
+        //  event.preventDefault()
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST" target="_blank"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'view-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+
+     $('.mark-case-btn').click(function (event) {
+            event.preventDefault()
+            var case_id = $(this).attr('case-id');
+            debugger
+            swal({
+                title: 'Mark Case as attention required',
+                text: 'Are you sure you want mark this case?',
+                type: 'warning',
+                confirmButtonText: 'Yes',
+                showCancelButton: true,
+                cancelButtonText: 'No'
+            }).then(
+                function () {
+                $.post('/investigator/mark-case/', {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    case_id: case_id,
+                    mark:'mark'
+                }, function () {
+                    swal({
+                        title: 'Success!',
+                        text: 'The Case is marked for attention',
+                        type: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    })
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                }).fail(function (error) {
+                
+                swal({
+                    title: 'Unable to mark',
+                    text: 'Unable to mark case as case is already closed',
+                    type: 'error',
+                    showConfirmButton: true
+
+                });
+            });
+            })
+     });
+     $('.unmark-case-btn').click(function (event) {
+            event.preventDefault()
+            var case_id = $(this).attr('case-id');
+            debugger
+            swal({
+                title: 'Unmark Case as attention required',
+                text: 'Are you sure you want unmark this case?',
+                type: 'warning',
+                confirmButtonText: 'Yes',
+                showCancelButton: true,
+                cancelButtonText: 'No'
+            }).then(
+                function () {
+                $.post('/investigator/mark-case/', {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    case_id: case_id,
+                    mark:'unmark'
+                }, function () {
+                    swal({
+                        title: 'Success!',
+                        text: 'The Case is unmarked for attention',
+                        type: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    })
+                    setTimeout(function () {
+                        location.reload();
+                    }, 2000);
+                }).fail(function (error) {
+                
+                swal({
+                    title: 'Unable to unmark',
+                    text: 'Unable to unmark case as case is already closed',
+                    type: 'error',
+                    showConfirmButton: true
+                });
+            });
+            })
+     });
+
+     
+    // $("#move-page-to-top").click(function(){
+    //     document.body.scrollTop = 0;
+    //     document.documentElement.scrollTop = 0;   
+    // })
+    // $("#move-page-to-bottom").click(function(){
+    //         document.body.scrollTop = 999999;
+    //         document.documentElement.scrollTop = 9999999;
+    //     })
+    {% if not is_case_closed %}
+    $("#move-to-status-panel-button").click(function() {
+    $('html,body').animate({
+        scrollTop: $("#case-status").offset().top},
+        'slow');
+    });
+    $(window).on('resize scroll', function() {
+        if ($("#case-status").isInViewport())
+        {
+            $("#move-to-status-panel-button").css('display','none')
+        }
+        else
+        {
+            $("#move-to-status-panel-button").css('display','block')
+        }
+    })
+    $.fn.isInViewport = function() {
+    var elementTop = $(this).offset().top + 325;
+    var elementBottom = elementTop + $(this).outerHeight() -700;
+
+    var viewportTop = $(window).scrollTop();
+    var viewportBottom = viewportTop + $(window).height();
+
+    return elementBottom > viewportTop && elementTop < viewportBottom;
+};
+{% endif %}
+open = false
+$(".panel-heading").click(function(){
+    debugger
+    if(open == true){
+        open = false
+        $("#case-details-heading").text("Click here for more case details")
+    }
+    else{
+        open = true
+        $("#case-details-heading").text("Click here for less case details")
+    }
+})
+
+</script>
+
+{% endblock other_scripts %}

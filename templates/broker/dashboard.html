@@ -1,0 +1,387 @@
+{% extends 'broker/base.html' %} {% load staticfiles %} {% load range_filter %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet" />   
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet" />
+<link href="{% static 'theme/js/bootstrap-datetimepicker/css/datetimepicker.css' %}" rel="stylesheet" />
+
+<link rel="stylesheet" href="{% static 'theme/js/data-tables/DT_bootstrap.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+
+
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+
+
+<!-- Dashboard files -->
+<link rel="stylesheet" type="text/css" href="{% static 'theme/dashboard-d3-css/cases_added_closed.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/cases_based_on_signatures_obtained_and_client_cancelled.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/donut_cases_status.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/donut_payment_status.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'theme/css/bootstrap.css' %}"> -->
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/revenue.css' %}">
+
+
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" /> {% endblock theme_styles %} {% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+
+<style>
+#cases-based-on-signature-obtained {
+    margin: 0 auto;
+    width:550px;
+ 
+}
+#daily-revenue-graph-button{
+background: #1fb5ad;
+}
+#monthly-revenue-graph-button{
+background: #1fb5ad;
+}
+#no_data_container{
+    height: 100px;
+    padding: 10px;
+    background: url({%static 'theme/images/data_cloud.png' %}) no-repeat center;
+}
+#no_data_text{
+    top:  50%;
+    position:  relative;
+    transform: translateY(-50%);
+    font-weight: bold;
+    font-size: 140%;
+    color: #797979
+}
+@media only screen and (max-width: 500px) {
+    .panel-body{
+    overflow-y:scroll;
+   display:block;
+    }
+}
+
+</style>
+{% endblock other_styles %} {% load range_filter %} {% block content %}
+
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                        Cases added closed
+                <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                 </span>
+            </header>
+            <div class="panel-body">
+                {% if no_data %}
+                
+                <div id="no_data_container"> <div id="no_data_text">No Data Found</div> </div>
+
+                {% else %}
+                <div id="graph-based-on-cases-added-closed">
+                        
+                <div class="colorPalet">
+                                <div class="color-for-cases-added-closed-div"><div class="color2"></div><div class="label-for-cases-added-closed">Cases Added</div> </div>
+                                <div class="color-for-cases-added-closed-div"><div class="color1"></div><div class="label-for-cases-added-closed">Cases Closed</div> </div>
+                        </div>
+                <span> <h4>Percent Closed = {{percentage_of_cases_closed}}%</h4></span>
+                </div>
+                {% endif %}  
+            </div>
+        </section>
+</div>
+<div class="col-md-12">
+            <section class="panel case-card">
+                    {% csrf_token %}
+                <header class="panel-heading">
+                                Cases based on signature obtained
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    {% if no_data %}
+                        <div id="no_data_container">
+                            <div id="no_data_text">No Data Found</div>
+                        </div>
+                    {% else %}
+                        <div id="cases-based-on-signature-obtained"></div>
+                        <h2>Total Cases  = {{total_cases_count}}</h2>
+                    {% endif %}
+                </div>
+            </section>
+</div>
+<div class="col-md-12">
+    <section class="panel case-card">
+            {% csrf_token %}
+        <header class="panel-heading">
+                Case Status Donut
+            <span class="tools pull-right">
+                <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                </span>
+        </header>
+        <div class="panel-body">
+                {% if no_data %}
+                    <div id="no_data_container">
+                        <div id="no_data_text">No Data Found</div>
+                    </div>
+                {% else %}
+                    {% if total_cases_for_case_status_donut == 0 %}
+                        <div style="background:#f7f7f7;">
+                            No open cases
+                        </div>
+                    {% else %}
+                        <div id="cases-status-donut">
+                        </div>
+                        <h2>Total Open Cases  = {{total_cases_for_case_status_donut}}</h2>
+                    {% endif %}
+                {% endif %}
+        </div>
+    </section>
+</div>
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                    Case Payment Status Donut
+                <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                    </span>
+            </header>
+            <div class="panel-body">
+                <div class="panel-body">
+                        {% if no_data %}
+                            <div id="no_data_container">
+                                <div id="no_data_text">No Data Found</div>
+                            </div>
+                        {% else %}
+                            <div id="cases-payment-status-donut">
+                            </div>
+                            <h2>Total Cases  = {{total_cases_count}}</h2>
+                        {% endif %}
+                </div>
+            </div>
+        </section>
+</div>
+<div class="col-md-12">
+                <section class="panel case-card">
+                        {% csrf_token %}
+                    <header class="panel-heading">
+                            Revenue Graph
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                            </span>
+                    </header>
+                    <div class="panel-body">
+                        {% if no_data %}
+                            <div id="no_data_container">
+                                <div id="no_data_text">No Data Found</div>
+                            </div>
+                        {% else %}
+                            <div id="revenueGraph"></div>
+                            <div class="button-group">
+                                            <button id="daily-revenue-graph-button">Daily</button>
+                                            <button id="monthly-revenue-graph-button">Monthly</button>
+                                    </div>
+                        {% endif %}
+                    </div>
+                        
+                </section>
+</div>
+<div class="col-md-12">
+                        <section class="panel case-card">
+                                {% csrf_token %}
+                            <header class="panel-heading">
+                                    Top Investigators of the month
+                                <span class="tools pull-right">
+                                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                                    </span>
+                            </header>
+                            <div class="panel-body">
+                                        <table class="table table-striped table-hover table-bordered" id="investigator-table">
+                                        <thead>
+                                        <th>Rank</th>
+                                        <th>Investigator Name</th>
+                                        <th>Case assigned this month</th>
+                                        <th>Percentage of signature obtained</th>
+                                        </thead>
+                                        <tbody id ="investigator-details">
+                                        {% for investigator, cases_assigned, signature_obtained_percent in investigators_data %}
+                                        <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td> {{investigator.user.first_name}} {{investigator.user.last_name}} </td>
+                                        <td>{{cases_assigned}}</td>
+                                        <td>{{signature_obtained_percent}}</td>
+                                        </tr>
+                                        {% endfor  %}
+                                        </tbody>
+                                        </table>        
+                        *Note this data is based on last 30 days
+                            </div>
+                        </section>
+        </div>
+
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery-1.10.2.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery-migrate.js' %}"></script>
+
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script class="include" type="text/javascript" src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/data-tables/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/js/data-tables/DT_bootstrap.js' %}"></script>
+
+
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-daterangepicker/moment.min.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+
+<script src="{% static 'theme/js/infinite-scroll.pkgd.js' %}"></script>
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+
+<!--script for this page only-->
+<script src="{% static 'theme/js/table-editable.js' %}"></script>
+<!-- <script src="{% static 'theme/js/icheck-init.js' %}"></script> -->
+<script src="{% static 'theme/js/table-editable1.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+<script src="{% static 'theme/js/infinite-scroll.pkgd.js' %}"></script>
+
+<script>
+var others = {{others}} ;
+var client_cancelled_count = {{ client_cancelled }} ; 
+var signature_obtained_count = {{ signature_obtained }} ; 
+var signature_not_obtained_count = {{signature_not_obtained}}  ;
+var case_status_inactive = {{case_status_inactive}};
+var case_status_in_progress = {{case_status_in_progress}};
+var case_status_called_and_texted = {{case_status_called_and_texted}};
+var case_status_client_contacted  = {{case_status_client_contacted}};
+var case_status_client_meeting_set  = {{case_status_client_meeting_set}};
+var case_status_client_rescheduled = {{case_status_client_rescheduled}};
+var case_signature_obtained  = {{case_signature_obtained}};
+var case_status_signature_not_obtained = {{case_status_signature_not_obtained}};
+var payment_paid_and_closed = {{payment_paid_and_closed}};
+var payment_invoice_generated_but_not_paid = {{payment_invoice_generated_but_not_paid}};
+var payment_invoice_sent_but_not_paid = {{payment_invoice_sent_but_not_paid}};
+var payment_closed_but_no_invoice = {{payment_closed_but_no_invoice}};
+var payment_in_progress = {{payment_in_progress}};
+var addedCaseData=[
+{% for date,no_of_cases_added in cases_added %}
+        {
+                "date":new Date("{{date}}"),
+                "cases":{{no_of_cases_added}}
+        },
+{% endfor %}
+]
+
+var closedCaseData = [
+{% for date,no_of_cases_closed in cases_closed %}
+        {
+                "date":new Date("{{date}}"),
+                "cases":{{no_of_cases_closed}}
+        },
+{% endfor %}
+]
+
+var monthlyRevenueDiffOrder = [
+    {% for month,revenue in total_revenue_graph_monthly %} 
+    {
+        "month":new Date("{{month}}"),
+        "revenue":{{revenue}}
+
+    },
+    {% endfor %}
+]
+var monthlyRevenue = monthlyRevenueDiffOrder.reverse()
+var revenueGraphDailyData = [
+    {% for date,revenue in total_revenue_graph_daily %} 
+    {
+        "date":new Date("{{date}}"),
+        "revenue":{{revenue}}
+
+    },
+    {% endfor %}
+]
+</script>
+<!-- script for dashboard -->
+<script src="{% static 'theme/js/d3.js' %}" ></script>
+<!-- <script src="{% static 'theme/js/d3v4.js' %}" ></script> -->
+<script src="{% static 'theme/js/d3-selection-multi.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap.min.js' %}" ></script>
+<script src="{% static 'theme/js/plotly.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/dashboard-d3-js/cases_added_closed.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/cases_based_on_signatures_obtained_and_client_cancelled.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/donut_cases_status.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/donut_payment_status.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/broker_revenue.js' %}"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" ></script> -->
+<script src="{% static 'theme/dashboard-d3-js/revenue_graph_for_investigator.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+$('a[data-nav-item=dashboard]').addClass('active');
+$('#navigation-button').remove();
+$("#daily-revenue-graph-button").attr("disabled", "disabled");
+dailyRevenueGraph()
+$("#monthly-revenue-graph-button").click(function(){
+
+        $("#monthly-revenue-graph-button").attr("disabled", "disabled");
+        $("#svg-for-revenue-graph").remove()
+        $("#tooltip-for-revenue-graph").remove()
+        monthlyRevenueGraph()
+        $("#daily-revenue-graph-button").removeAttr("disabled", "disabled");
+})
+$("#daily-revenue-graph-button").click(function(){
+
+        $("#daily-revenue-graph-button").attr("disabled", "disabled");
+        $("#svg-for-revenue-graph").remove()
+        $("#tooltip-for-revenue-graph").remove()
+        dailyRevenueGraph()
+        $("#monthly-revenue-graph-button").removeAttr("disabled", "disabled");
+})
+</script>
+{% endblock other_scripts %}

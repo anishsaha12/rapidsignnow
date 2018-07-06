@@ -1,0 +1,118 @@
+.sidebar-toggle-box:hover {
+    background: #32d2c9;
+}
+
+.sidebar-toggle-box:active {
+    background: #f6f6f6;
+}
+
+.swal2-modal .swal2-title {
+    line-height: 40px;
+    margin-bottom: 20px;
+}
+
+input[name*="phone"]::-webkit-inner-spin-button, 
+input[name*="phone"]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+.select2-container-multi.select2-container-disabled .select2-choices,
+.select2-container.select2-container-disabled .select2-choice {
+    background: transparent;
+    border: none;
+}
+
+.select2-container-multi.select2-container-disabled,
+.select2-container.select2-container-disabled {
+    border: none;
+}
+
+.select2-container.select2-container-disabled .select2-choice .select2-arrow {
+    display: none;
+}
+
+.no-mouse-events {
+    cursor: pointer;
+}
+
+#navigation-button {
+    transform: translateX(20px);
+}
+
+@media (max-width: 479px) {
+    .sidebar-toggle-box {
+        left: 25px;
+    }
+    
+    body {
+        margin-top: 60px !important;
+    }
+    
+    .brand {
+        height: 60px;
+    }
+    
+    .header.fixed-top {
+        position: fixed !important;
+    }
+    
+    .top-nav {
+        margin: 10px 0;
+    }
+    
+    #sidebar {
+        top: 60px;
+    }
+    
+    #main-content {
+        padding-top: 50px;
+    }
+}
+
+.dataTables_info {
+    display: none;
+}
+
+.dataTables_filter {
+    width: 78% !important;
+}
+
+#top_menu {
+    margin-top: 0px;
+    float: right;
+    
+    a[data-toggle=dropdown] {
+        padding: 4px 8px;
+    }
+}
+
+.top-menu .dropdown-menu:after, .top-menu .dropdown-menu:before {
+    left: auto;
+    right: 3%;
+}
+
+.swal2-input::-webkit-input-placeholder {
+  color: darkgray !important;
+}
+.swal2-input::-moz-placeholder {
+  color: darkgray !important;
+}
+.swal2-input:-ms-input-placeholder {
+  color: darkgray !important;
+}
+.swal2-input:-moz-placeholder {
+  color: darkgray !important;
+}
+
+.form-control {
+    color: #1b1b1b;
+}
+
+.swal2-content .dataTable {
+    text-align: left;
+}
+
+.notification-element.read {
+    opacity: 0.4;
+}

@@ -1,0 +1,745 @@
+{% extends 'master_broker/base.html' %} {% load staticfiles %} {% load range_filter %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet">   
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet" >
+<link href="{% static 'theme/js/bootstrap-datetimepicker/css/datetimepicker.css' %}" rel="stylesheet" >
+
+<link rel="stylesheet" href="{% static 'theme/js/data-tables/DT_bootstrap.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+
+
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+{% endblock theme_styles %} {% block other_styles %}
+
+<!-- Dashboard files -->
+<link rel="stylesheet" type="text/css" href="{% static 'theme/dashboard-d3-css/cases_added_closed.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/cases_based_on_signatures_obtained_and_client_cancelled.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/donut_cases_status.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/donut_payment_status.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'theme/css/bootstrap.css' %}"> -->
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/revenue.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/broker_revenue.css' %}">
+<link rel="stylesheet" href="{% static 'theme/dashboard-d3-css/map.css' %}">
+
+
+
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+
+<style>
+#cases-based-on-signature-obtained {
+    margin: 0 auto;
+    width:550px;
+ 
+}
+#daily-revenue-graph-button{
+background: #1fb5ad;
+}
+#revenue-graph-range-button{
+background: #1fb5ad;
+}
+#cases-added-closed-graph-range-button{
+background: #1fb5ad;
+}
+#broker-revenue-graph-range-button{
+background: #1fb5ad;
+}
+#monthly-revenue-graph-button{
+background: #1fb5ad;
+}
+button:disabled,
+button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc;
+  color: #666666;
+}
+.broker-select {
+        padding: 0;
+        width: 100%;
+    }
+
+.broker-select>.select2-choice {
+height: 100%;
+}
+.input-large > label[class*="error"]{
+    position: absolute;
+    top: 35px;
+    right: 15px;
+    font-size: 12px;
+}
+@media only screen and (max-width: 500px) {
+    .panel-body{
+    overflow-y:scroll;
+   display:block;
+    }
+}
+</style>
+{% endblock other_styles %} {% load range_filter %} {% block content %}
+
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                        Cases added closed
+                <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                 </span>
+            </header>
+            <div class="panel-body">
+                        
+                <div id="graph-based-on-cases-added-closed">
+                        {% include 'cases_added_closed.html' %}
+                </div>
+                <br>
+                <form action="." method="post" style="display: inline-block;" id="cases-added-closed-form">
+                                
+                <div class="form-group">
+                                {% csrf_token %}
+                                <input style="display:none" name="context" value="cases-added-closed">
+                                <div class="col-sm-3 control-label col-lg-3">Date Range <sup>*</sup></div>
+                                <div class="col-lg-6">
+                                        
+                                                <div class="input-group input-large" data-date="mm/dd/yyyy" data-date-format="mm/dd/yyyy">
+                                                    <input required type="text" class="form-control dpd1 from-cases-added-closed" name="from" id="from-date">
+                                                    <span class="input-group-addon">To</span>
+                                                    <input required type="text" class="form-control dpd2 to-cases-added-closed" name="to" id="to-date">
+                                                </div>
+                                            </div>
+                                    
+                        </div>
+                        <button style="margin-top: -25px;" type="submit" id="cases-added-closed-graph-range-button">Submit</button>
+                </div>  
+        </form>
+            </div>
+        </section>
+</div>
+<div class="col-md-12">
+            <section class="panel case-card">
+                    {% csrf_token %}
+                <header class="panel-heading">
+                                Cases based on signature obtained
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                        <div id="cases-based-on-signature-obtained"></div>
+                        <h2>Total Cases  = {{total_cases_count}}</h2>
+                </div>
+            </section>
+</div>
+<div class="col-md-12">
+    <section class="panel case-card">
+            {% csrf_token %}
+        <header class="panel-heading">
+                Case Status Donut
+            <span class="tools pull-right">
+                <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                </span>
+        </header>
+        <div class="panel-body">
+                        <div id="cases-status-donut">
+                        </div>
+                        <h2>Total Open Cases  = {{total_cases_for_case_status_donut}}</h2>
+                
+        </div>
+    </section>
+</div>
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                    Case Payment Status Donut
+                <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                    </span>
+            </header>
+            <div class="panel-body">
+                <div class="panel-body">
+                        <div id="cases-payment-status-donut">
+                        </div>
+                        <h2>Total Cases  = {{total_cases_count}}</h2>
+                
+        </div>
+            </div>
+        </section>
+</div>
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                    Broker Revenue Graph
+                <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                    </span>
+            </header>
+            <div class="panel-body">
+                    <div id="brokerRevenueGraph">
+
+                    </div>
+        
+                                
+                                <div class="form-group">
+                                                
+                                                <div class="col-sm-3 control-label col-lg-3"><h4 style="margin-top: 7px;">Broker</h4></div>
+                                                <div class="col-lg-6">
+                                                <select name="broker" class="form-control mbot-15 broker-select" data-placeholder="Please select a broker">
+                                                        <option value=""></option>
+                                                        {% for broker in brokers %}
+                                                        <option value="{{ broker.pk }}">{{ broker.user.first_name }} {{ broker.user.last_name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                </div>
+                        </div>
+                            <br><br>
+
+                            <form action="." method="post" style="display: inline-block;" id="broker-revenue-form">
+                                        {% csrf_token %}
+                                        <input style="display:none" name="context" value="broker-revenue">
+                            <div class="form-group">
+                                        <div class="col-sm-3 control-label col-lg-3">Date Range <sup>*</sup></div>
+                                        <div class="col-lg-6">
+                                            <div class="input-group input-large" data-date="mm/dd/yyyy" data-date-format="mm/dd/yyyy">
+                                                <input type="text" required class="form-control dpd1 from-broker-revenue" name="from" id="from-date-broker-revenue">
+                                                <span class="input-group-addon" id="to">To</span>
+                                                <input type="text" required class="form-control dpd2 to-broker-revenue" name="to" id="to-date-broker-revenue">
+                                            </div>
+                                            
+                                        </div>
+                                        <button type="submit" id="broker-revenue-graph-range-button">Submit</button>
+                                    </div>
+                                </form>
+            </div>
+        </section>
+</div>
+<div class="col-md-12">
+        <section class="panel case-card">
+                {% csrf_token %}
+            <header class="panel-heading">
+                    Revenue Graph for RSN
+                <span class="tools pull-right">
+                    <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                    </span>
+            </header>
+            <div class="panel-body">
+                    
+                <div id="revenueGraph">
+                                {% include 'revenue_graph.html' %}
+                </div>
+                <div class="button-group">
+                                <button id="daily-revenue-graph-button">Daily</button>
+                                <button id="monthly-revenue-graph-button">Monthly</button>
+                        </div>
+            
+            <br>
+            <form action="." method="post" style="display: inline-block;" id="rsn-revenue-form">
+                        {% csrf_token %}
+            <input name="context" style="display:none" value="rsn-revenue">
+            <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Date Range <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <div class="input-group input-large" data-date="mm/dd/yyyy" data-date-format="mm/dd/yyyy">
+                                <input type="text" required class="form-control dpd1 from-rsn-revenue" name="from" id="from-date-rsn-revenue">
+                                <span class="input-group-addon" id="to">To</span>
+                                <input type="text" required class="form-control dpd2 to-rsn-revenue" name="to" id="to-date-rsn-revenue">
+                            </div>
+                            <br>
+                            
+                        </div>
+                        <button type = "submit" id="revenue-graph-range-button">Submit</button>
+                    </div>
+                </form>
+                </div>
+                
+        </section>
+</div>
+<div class="col-md-12">
+                <section class="panel case-card">
+                        {% csrf_token %}
+                    <header class="panel-heading">
+                                Cases in the country
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                         </span>
+                    </header>
+                    <div class="panel-body">
+                                
+                        <div id="map-data">
+                                
+                        </div>
+                            
+                    </div>
+                </section>
+</div>
+<div class="col-md-12">
+                <section class="panel case-card">
+                        {% csrf_token %}
+                    <header class="panel-heading">
+                            Top Brokers of the month
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                            </span>
+                    </header>
+                    <div class="panel-body">
+                                <table class="table table-striped table-hover table-bordered" id="broker-table">
+                                <thead>
+                                <th>Rank</th>
+                                <th>Broker Name</th>
+                                <th>Cases Added</th>
+                                <th>Cases Closed</th>
+                                <th>Percentage of case closed of cases added</th>
+                                </thead>
+                                <tbody id ="brokers">
+                                {% for broker,cases_added,cases_closed,percent in broker_closing_percent_data %}
+                                <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td> {{broker.user.first_name}} {{broker.user.last_name}} </td>
+                                <td>{{cases_added}}</td>
+                                <td>{{cases_closed}}</td>
+                                <td>{{percent}}</td>
+                                </tr>
+                                {% endfor  %}
+                                </tbody>
+                                </table>        
+                *Note this data is based on last 31 days
+                    </div>
+                </section>
+</div>
+<div class="col-md-12">
+                <section class="panel case-card">
+                        {% csrf_token %}
+                    <header class="panel-heading">
+                            Top Investigators of the month
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down" style="pointer-events: none;"></a>
+                            </span>
+                    </header>
+                    <div class="panel-body">
+                                <table class="table table-striped table-hover table-bordered" id="investigator-table">
+                                <thead>
+                                <th>Rank</th>
+                                <th>Investigator Name</th>
+                                <th>Case assigned this month</th>
+                                <th>Percentage of signature obtained</th>
+                                </thead>
+                                <tbody id ="investigator-details">
+                                {% for investigator, cases_assigned, signature_obtained_percent in investigators_data %}
+                                <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td> {{investigator.user.first_name}} {{investigator.user.last_name}} </td>
+                                <td>{{cases_assigned}}</td>
+                                <td>{{signature_obtained_percent}}</td>
+                                </tr>
+                                {% endfor  %}
+                                </tbody>
+                                </table>        
+                *Note this data is based on last 30 days
+                    </div>
+                </section>
+</div>
+
+
+
+{% endblock content %} {% block theme_scripts %}
+
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-daterangepicker/moment.min.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
+<!-- <script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script> -->
+
+<script src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<!-- <script src="{% static 'theme/js/icheck-init.js' %}"></script> -->
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+<!-- <script src="{% static 'theme/js/advanced-form.js' %}"></script> -->
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %} 
+<script>
+us_states_link = "{% static 'theme/us_states.json' %}"
+
+// Data for Dashboard
+var others = {{others}} ;
+var client_cancelled_count = {{ client_cancelled }} ; 
+var signature_obtained_count = {{ signature_obtained }} ; 
+var signature_not_obtained_count = {{signature_not_obtained}}  ;
+var case_status_inactive = {{case_status_inactive}};
+var case_status_in_progress = {{case_status_in_progress}};
+var case_status_called_and_texted = {{case_status_called_and_texted}};
+var case_status_client_contacted  = {{case_status_client_contacted}};
+var case_status_client_meeting_set  = {{case_status_client_meeting_set}};
+var case_status_client_rescheduled = {{case_status_client_rescheduled}};
+var case_signature_obtained  = {{case_signature_obtained}};
+var case_status_signature_not_obtained = {{case_status_signature_not_obtained}};
+var payment_paid_and_closed = {{payment_paid_and_closed}};
+var payment_invoice_generated_but_not_paid = {{payment_invoice_generated_but_not_paid}};
+var payment_invoice_sent_but_not_paid = {{payment_invoice_sent_but_not_paid}};
+var payment_closed_but_no_invoice = {{payment_closed_but_no_invoice}};
+var payment_in_progress = {{payment_in_progress}};
+var addedCaseData=[
+{% for date,no_of_cases_added in cases_added %}
+        {
+                "date":new Date("{{date}}"),
+                "cases":{{no_of_cases_added}}
+        },
+{% endfor %}
+]
+
+var closedCaseData = [
+{% for date,no_of_cases_closed in cases_closed %}
+        {
+                "date":new Date("{{date}}"),
+                "cases":{{no_of_cases_closed}}
+        },
+{% endfor %}
+]
+
+var monthlyRevenueDiffOrder = [
+    {% for month,revenue in total_revenue_graph_monthly %} 
+    {
+        "month":new Date("{{month}}"),
+        "revenue":{{revenue}}
+
+    },
+    {% endfor %}
+]
+var monthlyRevenue = monthlyRevenueDiffOrder.reverse()
+var revenueGraphDailyData = [
+    {% for date,revenue in total_revenue_graph_daily %} 
+    {
+        "date":new Date("{{date}}"),
+        "revenue":{{revenue}}
+
+    },
+    {% endfor %}
+]
+
+var proposedMonthlyRevenueDiffOrder = [
+    {% for month,revenue in total_proposed_revenue_graph_monthly %} 
+    {
+        "month":new Date("{{month}}"),
+        "revenue":{{revenue}}
+
+    },
+    {% endfor %}
+]
+var proposedMonthlyRevenue = proposedMonthlyRevenueDiffOrder.reverse()
+var proposedRevenueGraphDailyData = [
+    {% for date,revenue in total_proposed_revenue_graph_daily %} 
+    {
+        "date":new Date("{{date}}"),
+        "revenue":{{revenue}}
+
+    },
+    {% endfor %}
+]
+
+
+
+
+var brokerRevenue = [
+    {% for broker_data in broker_revenue %}
+    {
+    "id": {{ forloop.counter }},
+    "revenue": [
+                {% for date,profit in broker_data %}
+                {
+                    "date":new Date("{{date}}"),
+                    "revenue":{{profit}}
+                },
+                {% endfor %}
+                ]
+                
+    },
+    {% endfor %}
+]
+brokerCount = {{brokers_count}}
+var mapData = [
+        {% for state,cases in map_data %}
+        {
+                "state":"{{state}}",
+                "value": {{cases}}
+        }, 
+        {% endfor %}
+]
+
+total_cases  = {{total_cases_count}}
+
+// $('.from-rsn-revenue').datepicker()
+// $('.to-rsn-revenue').datepicker()
+// $('.from-broker-revenue').datepicker()
+// $('.to-broker-revenue').datepicker()
+{% if range_for == "cases-added-closed" %}
+$('.from-cases-added-closed').datepicker('setDate','{{from}}');
+$('.from-cases-added-closed').val("{{from}}")
+$('.to-cases-added-closed').datepicker('setDate','{{to}}');
+
+{% elif range_for == "rsn-revenue" %}
+$('.from-rsn-revenue').datepicker('setDate','{{from}}');
+$('.to-rsn-revenue').datepicker('setDate','{{to}}');
+
+{% elif range_for == "broker-revenue" %}
+$('.from-broker-revenue').datepicker('setDate','{{from}}');
+$('.to-broker-revenue').datepicker('setDate','{{to}}');
+
+{% endif %}
+</script>
+<!-- script for dashboard -->
+<script src="{% static 'theme/js/d3.js' %}" ></script>
+<!-- <script src="{% static 'theme/js/d3v4.js' %}" ></script> -->
+<script src="{% static 'theme/js/d3-selection-multi.js' %}"></script>
+<!-- <script src="{% static 'theme/js/bootstrap.min.js' %}" ></script> -->
+<!-- <script src="{% static 'theme/js/plotly.min.js' %}"></script> -->
+<script type="text/javascript" src="{% static 'theme/dashboard-d3-js/cases_added_closed.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/cases_based_on_signatures_obtained_and_client_cancelled.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/donut_cases_status.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/donut_payment_status.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/broker_revenue.js' %}"></script>
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" ></script> -->
+<script src="{% static 'theme/dashboard-d3-js/revenue_graph.js' %}"></script>
+<script src="{% static 'theme/dashboard-d3-js/us_map_covered_status.js' %}"></script>
+<script>
+$('a[data-nav-item=dashboard]').addClass('active');
+$('#navigation-button').remove();
+$("#daily-revenue-graph-button").attr("disabled", "disabled");
+// $("#from-date").datepicker()
+// $("#to-date").datepicker()
+dailyRevenueGraph()
+$("#monthly-revenue-graph-button").click(function(){
+
+        $("#monthly-revenue-graph-button").attr("disabled", "disabled");
+        $("#svg-for-revenue-graph").remove()
+        $("#tooltip-for-revenue-graph").remove()
+        monthlyRevenueGraph()
+        $("#daily-revenue-graph-button").removeAttr("disabled", "disabled");
+})
+$("#daily-revenue-graph-button").click(function(){
+
+        $("#daily-revenue-graph-button").attr("disabled", "disabled");
+        $("#svg-for-revenue-graph").remove()
+        $("#tooltip-for-revenue-graph").remove()
+        dailyRevenueGraph()
+        $("#monthly-revenue-graph-button").removeAttr("disabled", "disabled");
+})
+$('.broker-select').val("1")
+dailyBrokerRevenueGraph(1)
+
+$(".broker-select").on("change",function(){
+        broker_id = $(".broker-select").val();
+        $("#svg-for-broker-revenue-graph").remove()
+        $("#tooltip-for-broker-revenue-graph").remove()
+        dailyBrokerRevenueGraph(broker_id)
+})
+map(mapData)
+
+// $("#cases-added-closed-graph-range-button").click(function(event){
+//         debugger
+//         from_date = $("#from-date").val()
+//         to_date = $("#to-date").val()
+//         $.post('/master-broker/dashboard-filters/', {
+//             "context": "cases-added-closed",
+//             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+//             "from":from_date,
+//             "to":to_date
+//         }, function (returned_data) {
+//                 console.log(returned_data.cases_added)
+//                 addedCaseData = returned_data.cases_added
+//                 debugger
+//         }
+// );
+// })
+
+// for cases-added-closed-range
+var nowDate = new Date();
+    var today = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+    var endDate = $("#to-date").val();
+    var startDate = $("#from-date").val();
+
+    var fromDatePicker = $('#from-date');
+    var toDatePicker = $('#to-date');
+
+    fromDatePicker.datepicker({
+        autoclose: true,
+        endDate: today
+    }).on('changeDate', function (e) {
+        if(toDatePicker.val()!="" && toDatePicker.val()<fromDatePicker.val()){
+            $('#cases-added-closed-form').validate({
+                rules: {
+                    to: { 
+                    greaterThan:"#from-date"
+                    }
+                }
+            });
+        }
+});
+
+
+    toDatePicker.datepicker({
+        autoclose: true,
+        endDate: today
+    }).on('changeDate', function (e) {
+        // // Revalidate the date field
+        // fromDatePicker.formValidation('revalidateField', 'date');
+        if(fromDatePicker.val()!="" && toDatePicker.val()<fromDatePicker.val()){
+            $('#cases-added-closed-form').validate({
+                rules: {
+                    to: { 
+                    greaterThan:"#from-date"
+                    }
+                }
+            });
+        }
+    });
+
+
+//for rsn revenue
+var nowDate = new Date();
+    var today_rsn_revenue = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+    var endDate = $("#to-date-rsn-revenue").val();
+    var startDate = $("#from-date-rsn-revenue").val();
+
+    var fromDatePicker_rsn_revenue = $('#from-date-rsn-revenue');
+    var toDatePicker_rsn_revenue = $('#to-date-rsn-revenue');
+
+    fromDatePicker_rsn_revenue.datepicker({
+        autoclose: true,
+        endDate: today_rsn_revenue
+    }).on('changeDate', function (e) {
+        if(toDatePicker_rsn_revenue.val()!="" && toDatePicker_rsn_revenue.val()<fromDatePicker_rsn_revenue.val()){
+            $('#rsn-revenue-form').validate({
+                rules: {
+                    to: { 
+                        greaterThan:"#from-date-rsn-revenue"
+                    }
+                }
+            });
+        }
+});
+
+
+toDatePicker_rsn_revenue.datepicker({
+        autoclose: true,
+        endDate: today_rsn_revenue
+    }).on('changeDate', function (e) {
+        // // Revalidate the date field
+        // fromDatePicker.formValidation('revalidateField', 'date');
+        if(fromDatePicker_rsn_revenue.val()!="" && toDatePicker_rsn_revenue.val()<fromDatePicker_rsn_revenue.val()){
+            $('#rsn-revenue-form').validate({
+                rules: {
+                    to: { 
+                        greaterThan:"#from-date-rsn-revenue"
+                    }
+                }
+            });
+        }
+    });
+
+
+//for broker revenue
+var nowDate = new Date();
+    var today_broker_revenue = new Date(nowDate.getFullYear(), nowDate.getMonth(), nowDate.getDate(), 0, 0, 0, 0);
+    var endDate = $("#to-date-broker-revenue").val();
+    var startDate = $("#from-date-broker-revenue").val();
+
+    var fromDatePicker_broker_revenue = $('#from-date-broker-revenue');
+    var toDatePicker_broker_revenue = $('#to-date-broker-revenue');
+
+    fromDatePicker_broker_revenue.datepicker({
+        autoclose: true,
+        endDate: today_broker_revenue
+    }).on('changeDate', function (e) {
+            // debugger
+        if(toDatePicker_broker_revenue.val()!="" && toDatePicker_broker_revenue.val()<fromDatePicker_broker_revenue.val()){
+            $('#broker-revenue-form').validate({
+                rules: {
+                    to: { 
+                        greaterThan:"#from-date-broker-revenue"
+                    }
+                }
+            });
+        }
+});
+
+
+toDatePicker_broker_revenue.datepicker({
+        autoclose: true,
+        endDate: today_broker_revenue
+    }).on('changeDate', function (e) {
+        // // Revalidate the date field
+        // fromDatePicker.formValidation('revalidateField', 'date');
+        if(fromDatePicker_broker_revenue.val()!="" && toDatePicker_broker_revenue.val()<fromDatePicker_broker_revenue.val()){
+            $('#broker-revenue-form').validate({
+                rules: {
+                    to: { 
+                        greaterThan:"#from-date-broker-revenue"
+                    }
+                }
+            });
+        }
+    });
+    
+
+    $.validator.addMethod("greaterThan", function(value, element, params) {
+            // debugger
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) > new Date($(params).val());
+        }
+
+        return isNaN(value) && isNaN($(params).val()) 
+            || (Number(value) > Number($(params).val())); 
+            
+    },'Must be greater than From Date.');
+
+    
+
+</script>
+{% endblock other_scripts %}

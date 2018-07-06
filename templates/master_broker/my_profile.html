@@ -1,0 +1,214 @@
+{% extends 'master_broker/base.html' %} {% load staticfiles %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/bootstrap-fileupload/bootstrap-fileupload.css' %}" rel="stylesheet" />
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" /> {% endblock theme_styles %} {% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}"> {% endblock other_styles %} {% load range_filter %} {% block content %}
+
+<form action="." method="post" class="form-horizontal bucket-form" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading no-mouse-events">
+                    My Profile
+                </header>
+                <div class="panel-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">First Name</div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="first-name" class="form-control" value="{{ master_broker.user.first_name }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Last Name</div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="last-name" class="form-control" value="{{ master_broker.user.last_name }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 1</div>
+                        <div class="col-lg-6">
+                            <input required name="phone-1" type="text" class="form-control" value="{{ master_broker.phone_number_one }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 2</div>
+                        <div class="col-lg-6">
+                            <input required name="phone-2" type="text" class="form-control" value="{{ master_broker.phone_number_two }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 1</div>
+                        <div class="col-lg-6">
+                            <input required name="email-1" type="email" class="form-control" value="{{ master_broker.email_one }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 2</div>
+                        <div class="col-lg-6">
+                            <input required name="email-2" type="email" class="form-control" value="{{ master_broker.email_two }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="street-1" type="text" class="form-control" value="{{ master_broker.address.street_one }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="street-2" type="text" class="form-control" value="{{ master_broker.address.street_two }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="city" type="text" class="form-control" value="{{ master_broker.address.city }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="state" type="text" class="form-control" value="{{ master_broker.address.state }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="zip-code" type="text" class="form-control" value="{{ master_broker.address.zip_code }}">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Certification</div>
+                        <div class="col-lg-6">
+                            <select name="certification" id="" class="form-control mbot-15">
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                                <option value="">Option</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">More info</div>
+                        <div class="col-lg-6">
+                            <textarea class="form-control" name="more-info" rows="6">{{ master_broker.more_info }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <div class="col-lg-6">
+                                    <input type="hidden" name="rating" value="{{ master_broker.rating }}">
+                                    <span class="rating">
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                    </span>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Photograph</label>
+                                        <div class="fileupload fileupload-new" data-provides="fileupload">
+                                            <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                                <div class="fileupload-new thumbnail" style="width: 200px; height: 150px;">
+                                                    {% if master_broker.photograph %}
+                                                    <img src="{{ master_broker.photograph.url }}" alt="">
+                                                    {% else %}
+                                                    <img src="http://www.placehold.it/200x150/EFEFEF/AAAAAA&amp;text=no+image" alt="">
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            <div class="fileupload-preview fileupload-exists thumbnail" style="max-width: 200px; max-height: 150px; line-height: 20px;"></div>
+                                            <div>
+                                               <span class="btn btn-white btn-file">
+                                                   <span class="fileupload-new"><i class="fa fa-paper-clip"></i> Select image</span>
+                                                   <span class="fileupload-exists"><i class="fa fa-undo"></i> Change</span>
+                                                   <input type="file" class="default" name="photograph">
+                                               </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+    </div>
+</form>
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-fileupload/bootstrap-fileupload.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+    $('#navigation-button').remove();
+    $('input, textarea').attr('readonly', 'readonly');
+    $('select').attr('disabled', 'disabled');
+    
+    $('select[name=languages]').val({{ investigator.languages|safe }});
+    
+    $('select[name=country]').val('{{ investigator.address.country }}');
+    $('select[name=secondary-country]').val('{{ investigator.secondary_address.country }}');
+    
+    $('.rating').addClass('fixed');
+    $('.star:nth-last-child({{ master_broker.rating }})').addClass('filled');
+
+</script>
+{% endblock other_scripts %}

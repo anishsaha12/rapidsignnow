@@ -1,0 +1,86 @@
+
+/* body { font: 12px Arial;} */
+
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+path1 { 
+    stroke: red;
+    stroke-width: 2;
+    fill: none;
+}
+ 
+.axis path,
+.axis line {
+    fill:none;
+    stroke: black;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+} 
+.axis path1, .line1{
+    fill: none;
+    stroke: red;
+    stroke-width: 2;
+    /* shape-rendering: crispEdges; */
+}
+
+
+#tooltip-for-cases-added-closed-graph {	
+    position: absolute;			
+    text-align: center;			
+    /* width: 60px;					 */
+    /* height: 28px;					 */
+    padding: 2px;				
+    /* font: 12px sans-serif;		 */
+    background: #3b3737;	
+    border: 0px;		
+    border-radius: 12px;			
+    pointer-events: none;	
+    color: white;
+    display: none;
+}
+.colorPalet{
+    height:200px;
+   
+    float: right;
+   
+    margin-top: 30px;
+}
+.color1{
+    width:20px;
+    height:20px;
+    background: red;
+    
+    border-radius: 8px;
+}
+.color2{
+    width:20px;
+    height:20px;
+    background: steelblue;
+  
+    border-radius: 8px;
+}
+.color-for-cases-added-closed-div{
+    width:100%;;
+    height:40px;
+   
+    margin-top: 20px;
+}
+.label-for-cases-added-closed{
+    height: 40px;
+    /* width: 60%; */
+    float: right;
+    font-size: 13px;
+    font-weight: 500;
+    margin-left: 40px;
+    margin-top: -20px;
+}
+
+@media only screen and (max-width: 500px) {
+    #graph-based-on-cases-added-closed{
+    overflow-y:scroll;
+   display:block;
+    }
+}

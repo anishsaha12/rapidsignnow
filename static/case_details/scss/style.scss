@@ -1,0 +1,86 @@
+.form-control[disabled], .form-control[readonly], .form-control[readonly] + .tagsinput {
+    background: white;
+    cursor: default;
+    border: none;
+    resize: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    pointer-events: none;
+    
+    &::placeholder {
+        color: white;
+    }
+}
+    
+.input-group-addon:first-child {
+    border-right: 1px solid rgba(150, 160, 180, 0.3);
+}
+
+.form-control {
+    color: #1b1b1b;
+    transition: color 0s linear 1s;
+}
+
+.form-horizontal .control-label {
+    word-break: break-word;
+}
+
+.form-buttons {
+    width: 70px;
+    text-align: center;
+    margin: 0 auto;
+    margin-bottom: 20px;
+    
+    &.editing .btn-success {
+        display: none;
+    }
+    
+    &:not(.editing) .btn-info {
+        display: none;
+    }
+}
+
+.btn-row {
+    text-align: center;
+}
+
+.panel-buttons {
+    transform: translateY(-8px);
+    margin-right: 10px;
+}
+
+.rate-label {
+    height: 50px;
+}
+
+.rating.fixed {
+    pointer-events: none;
+}
+
+.rating span.star.filled:before, .rating span.star.filled ~ span.star:before {
+    content: "\f005";
+    color: #41CAC0;
+}
+
+.fileupload .btn:not(.editing) {
+    display: none;
+}
+
+.extra-info-holder {
+    cursor: pointer;
+}
+
+.details-popup .swal2-content {
+    text-align: left;
+    padding-top: 10px;
+    
+    h2 {
+        font-weight: bold;
+        font-size: 1.2em;
+    }
+    
+    p {
+        margin-bottom: 30px;
+        font-size: 1em;
+    }
+}

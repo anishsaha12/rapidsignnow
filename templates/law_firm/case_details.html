@@ -1,0 +1,343 @@
+{% extends 'law_firm/base.html' %}
+
+{% load staticfiles %}
+
+{% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet"> 
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet">   
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet" >
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+{% endblock theme_styles %}
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'investigator/css/style.css' %}">
+<style>
+    .law-firm-select, .country-select-dropdown {
+        padding: 0;
+    }
+    
+    .law-firm-select > .select2-choice, .country-select-dropdown > .select2-choice {
+        height: 100%;
+    }
+    .client-button {
+        color: #888888;
+    }
+    
+    .form-row {
+        margin-bottom: 10px;
+    }
+    
+    .popup-form-data .label {
+        font-weight: bold;
+        display: inline-block;
+        vertical-align: middle;
+        width: 45%;
+        color: rgb(84, 84, 84);
+        text-align: left;
+    }
+    
+    .popup-form-data .value {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50%;
+        color: rgb(84, 84, 84);
+        text-align: left;
+    }
+    
+    .file-holder.hidden {
+        display: none;
+    }
+    
+    .swal2-modal .swal2-input[type=number] {
+        max-width: 100%;
+    }
+    
+    .case-extras {
+        text-align: left;
+    }
+    
+    .case-extras h2 {
+        font-size: 20px;
+        font-weight: bold;
+    }
+</style>
+{% endblock other_styles %}
+
+{% load range_filter %}
+
+{% block content %}
+
+<form action="." method="post" enctype="multipart/form-data" class="form-horizontal bucket-form">
+    <div class="tab-target show" data-target-value="case-details">
+        <div class="row">
+            <div class="col-sm-12">
+                <section class="panel">
+                    <header class="panel-heading">
+                        Case Details
+                        <span class="tools pull-right">
+                            <a href="javascript:;" class="fa fa-chevron-down"></a>
+                         </span>
+                    </header>
+                    <div class="panel-body">
+                        {% csrf_token %}
+                        <input type="hidden" name="context" value="update-case-details">
+                        {% include 'law_firm/case_form_snippet_law_firm.html' %}
+                    </div>
+                </section>
+            </div>
+        </div>
+
+       
+</form>
+
+<div class="tab-target show" data-target-value="timeline">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="timeline">
+                <article class="timeline-item alt">
+                    <div class="text-right">
+                        <div class="time-show first">
+                            <a class="btn btn-primary">Today</a>
+                        </div>
+                    </div>
+                </article>
+                {% for status_change in status_updates %}
+                <article class="timeline-item {% if forloop.counter|divisibleby:2 %}alt{% endif %}">
+                    <div class="timeline-desk">
+                        <div class="panel">
+                            <div class="panel-body">
+                                <span class="arrow-alt"></span>
+
+                                <span class="timeline-icon red">
+                                    <i class="fa fa-check"></i>
+                                </span>
+                                <span class="timeline-date"></span>
+                                <h1 class="red">
+                                    {{ status_change.timestamp |date:"D d F Y  h:i A" }}
+                                </h1>
+                                <p>{% if status_change.status == "Inactive" %}
+                                        In progress
+                                         {% else %}
+                                         {{ status_change.status }}
+                                    {% endif %} {% if status_change.extra_info %} <i class="fa fa-info-circle extra-info-holder" data-stringified-info="{{ status_change.extra_info }}"></i> {% endif %} ({{ status_change.user.first_name }} {{ status_change.user.last_name }})</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+
+{% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+<script src="{% static 'common/js/jquery.inputmask.bundle.min.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %}
+
+{% block other_scripts %}
+<script>
+    var case_id = Number.parseInt("{{ case.pk }}"), case_status = '{{ case.status }}', law_firm_id = Number.parseInt("{{ case.law_firm.pk }}"), additional_expenses = '{{ case.additional_expenses_text }}', no_of_miles = '{{ case.no_of_miles_text }}';
+    var no_of_adult_signatures_required = "{{ case.number_of_adult_signatures_required }}", no_of_child_signatures_required = "{{case.number_of_child_signatures_required}}";
+    var case_type_description = "{{case.type_description}}"
+    case_status = case_status.toLocaleLowerCase();
+    case_status = case_status.split(' ').join('-');
+    // $('input[name="case-status-radio"][value="' + case_status + '"]').prop('checked', true);
+    // $('select[name="law-firm"]').val(law_firm_id);
+    // $('select[name="country"]').val('{{ case.client_address.country }}');
+    // $('select[name="locality"]').val('{{ case.locality }}');
+    
+    // $('#adult-clients').tagsInput({
+    //     width:'auto',
+    //     defaultText: 'Add client'
+    // });
+    // $('#child-clients').tagsInput({
+    //     width:'auto',
+    //     defaultText: 'Add client'
+    // });
+
+    
+    $('#case-type').on('change',function(event){
+        if($('#case-type').val() != 'Others'){
+            $('#case-type-description').attr('disabled','disabled').attr('required',false).val('').attr('placeholder','');
+            
+        }else{
+
+            $('#case-type-description').attr('disabled',false).attr('required',true).attr('placeholder','Max. 200 chars').val(case_type_description);
+
+        }
+    });
+
+    $('#case-type-description').on('change',function(ev){
+        case_type_description = $(this).val(); 
+    });
+    $('input[name=edos]').datepicker('setDate','{{ case.expected_closing_date | date:"m/d/o" }}');
+    $('input[name=dol]').datepicker('setDate', '{{ case.dol | date:"m/d/o" }}');
+    $('input[name=dos]').datepicker('setDate', '{{ case.created_at | date:"m/d/o" }}');
+    // $('input[name=closing-date]').datepicker('setDate', '{{ case.closing_at | date:"m/d/o" }}');
+</script>
+<script src="{% static 'master_broker/js/details.js' %}"></script>
+<script>
+    $('#navigation-button').html('<i class="fa fa-chevron-left"></i> Back');
+    $('#navigation-button').click(function () {
+        window.history.back();
+    });
+    
+    // $.validator.addMethod('phone', function (value) {
+    //     if (value == '') {
+    //         return true;
+    //     }
+        
+    //     return /^\+\d \d\d\d\-\d\d\d\-\d\d\d\d$/.test(value); 
+    // }, 'Please enter a valid phone number.');
+    
+    // $('form').validate({
+    //     rules: {
+    //         'mobile-phone': {
+    //             phone: true
+    //         },
+    //         'home-phone': {
+    //             phone: true
+    //         }
+    //     }
+    // });
+    
+    $('input[name*=phone]').inputmask('+9 999-999-9999');
+    $('input:not(.swal2-input), textarea:not(.swal2-input)').attr('readonly', 'readonly');
+    $('select').attr('disabled', 'disabled');
+    // {% if editable %}
+    // $('#editCaseDetailsBtnsContainer').one('click', function() {
+        
+    //     $(this).toggleClass('editing');
+    //     $('input, textarea').removeAttr('readonly');
+    //     $('select').removeAttr('disabled');
+    //     $('.rating').toggleClass('fixed');
+    //     $('.fileupload .btn').toggleClass('editing');
+    //     $('.file-holder').toggleClass('hidden');
+        
+    //     $('.law-firm-select').select2({
+    //         width: '100%'
+    //     });
+    //     $('#country-select').select2({
+    //         width: '100%'
+    //     });
+    // });
+    
+
+    // {% if updated %}
+    //     swal({
+    //         title: 'Case updated',
+    //         text: 'The case has been updated',
+    //         type: 'success',
+    //         timer: 2000,
+    //         showConfirmButton: false
+    //     });
+    // {% endif %}
+    // {% endif %}
+
+    $('.download-document').click(function () {
+        //  debugger
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'download-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+     $('.document-print').click(function(event){
+        //  event.preventDefault()
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST" target="_blank"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'view-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+     var extraInfoHolder = function(){ $('.extra-info-holder').click(function () {
+    'use strict';
+
+    var info_object = JSON.parse($(this).attr('data-stringified-info')), html_string = '', key;
+
+    for (key in info_object) {
+        if (info_object.hasOwnProperty(key)) {
+            html_string += '<h4>' + key + '</h4>';
+            html_string += '<p>' + info_object[key] + '</p>';
+        }
+    }
+
+    swal({
+        title: 'Status Details',
+        html: html_string,
+        customClass: 'details-popup'
+    });
+});
+};
+extraInfoHolder()
+</script>
+{% endblock other_scripts %}

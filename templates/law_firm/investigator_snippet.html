@@ -1,0 +1,8 @@
+<div class="form-row"><div class="label">Name</div><div class="value">{{ investigator.user.first_name }} {{ investigator.user.last_name }}</div></div>
+<div class="form-row"><div class="label">Email</div><a href="mailto:{{investigator.email_one}}" class="value">{{ investigator.email_one }}</a></div>
+<div class="form-row"><div class="label">Phone</div><a href="tel:{{phone_number}}" class="value">{{ investigator.phone_number_one }}</a></div>
+<div class="form-row"><div class="label">Address</div><div class="value">{{ investigator.address }}</div></div>
+<div class="form-row"><div class="label">Status</div><div class="value">{% if investigator.is_active %}Active{% else %}Suspended{% endif %}</div></div>
+<div class="form-row"><div class="label">Cases this month</div><div class="value">{{ investigator.cases_in_month }}</div></div>
+<div class="form-row"><div class="label">Languages Known</div><div class="value">{{ languages |join:"," }}</div></div>
+<div class="form-row"><div class="label">Cases in lifetime</div><div class="value">{{ investigator.cases_in_lifetime }}</div></div>

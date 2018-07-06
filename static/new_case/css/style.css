@@ -1,0 +1,22 @@
+.form-control {
+  color: #1b1b1b;
+  transition: color 0s linear 1s; }
+
+.form-buttons {
+  width: 70px;
+  text-align: center;
+  margin: 0 auto; }
+
+.investigator-name {
+  cursor: pointer; }
+
+.table-dropdown-holder .text {
+  display: inline-block;
+  vertical-align: top;
+  width: calc(100% - 30px); }
+.table-dropdown-holder .options {
+  display: inline-block;
+  vertical-align: top;
+  width: 25px; }
+
+/*# sourceMappingURL=style.css.map */

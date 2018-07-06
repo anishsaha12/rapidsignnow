@@ -1,0 +1,14 @@
+#tooltip-for-broker-revenue-graph {	
+    position: absolute;			
+    text-align: center;			
+    /* width: 60px;					 */
+    /* height: 28px;					 */
+    padding: 2px;				
+    /* font: 12px sans-serif;		 */
+    background: #3b3737;	
+    border: 0px;		
+    border-radius: 12px;			
+    pointer-events: none;	
+    color: white;
+    display: none;
+}

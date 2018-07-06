@@ -1,0 +1,1511 @@
+{% extends 'system_admin/base.html' %}
+
+{% load staticfiles %}
+
+{% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet">   
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet" >
+<link href="{% static 'theme/js/bootstrap-datetimepicker/css/datetimepicker.css' %}" rel="stylesheet" >
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+{% endblock theme_styles %}
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}">
+<style>
+
+    .law-firm-select {
+        padding: 0;
+    }
+    
+    .law-firm-select > .select2-choice {
+        height: 100%;
+    }
+    
+    .selected-firm {
+        display: block;
+        margin: 20px auto;
+        text-align: center;
+        font-weight: bold;
+        font-size: 22px;
+    }
+    
+    .buttons-holder {
+        text-align: center;
+        margin-top: 20px;
+    }
+    
+    .bulk-buttons.hide {
+        display: none;
+    }
+    
+    .input-large {
+        position: relative;
+    }
+    
+    .input-large label {
+        position: absolute;
+        top: 35px;
+        right: 15px;
+    }
+
+    ul.export-as>li>a:hover, ul.export-as>li>a:focus{
+        background: whitesmoke;
+    }
+    ul.export-as>li>a:hover, ul.send-as>li>a:focus{
+        background: whitesmoke;
+    }
+    ul.export-as>li>a:hover, ul.delete>li>a:focus{
+        background: whitesmoke;
+    }
+
+
+    .dropdown-menu.extended li a:hover {
+    color: #32323a;
+    background: #dbeaea;
+}
+.dropdown-menu.extended{
+    width:30px !important;
+}
+/* #downloading-wait-div {
+    background: grey;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    top: 0;
+    left: 0;
+    position: absolute;
+    padding: 0;
+    transition: opacity .5s;
+    color: white;
+  } */
+</style>
+{% endblock other_styles %}
+
+{% load range_filter %}
+
+{% block content %}
+
+<div class="row">
+    <div class="col-sm-12">
+        <section class="panel">
+            <header class="panel-heading no-mouse-events">
+                Generate Invoice
+            </header>
+            <div class="panel-body">
+                <form action="." method="post" class="form-horizontal bucket-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="context" value="list-cases">
+                    
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Law Firm <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <select name="law-firm" required id="" class="form-control mbot-15 law-firm-select" data-placeholder="Please select a law firm">
+                                <option value=""></option>
+                                {% for law_firm in law_firms %}
+                                <option value="{{ law_firm.pk }}">{{ law_firm.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Date Range</div>
+                        <div class="col-lg-6">
+                            <div class="input-group input-large" data-date="mm/dd/yyyy" data-date-format="mm/dd/yyyy">
+                                <input required type="text" class="form-control dpd1" name="from" id="from-date">
+                                <span class="input-group-addon">To</span>
+                                <input required type="text" class="form-control dpd2" name="to" id="to-date">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-11">
+                        <div class="form-buttons">
+                            <button type="submit" class="btn btn-success">List cases</button>
+                        </div>
+                    </div>
+                    
+                </form>
+                <br><br><br>
+                
+                
+                
+                {% if selected_firm %}
+                <div class="buttons-holder bulk-buttons">
+                        <form action="." method="post" id="cases-bulk-invoice" style="display: inline-block;">
+                            {% csrf_token %}
+                            <input type="hidden" name="context" value="print-bulk-invoice">
+                            <input type="hidden" name="from" value="{{ from }}">
+                            <input type="hidden" name="download" value="true">
+                            <input type="hidden" name="invoice-sending" value="download">
+                            <input type="hidden" name="to" value="{{ to }}">
+                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                            <input type="hidden" name="case-ids" value="">
+                            <button class="btn btn-primary btn-sm generate-bulk-invoice" type="button" form="cases-bulk-invoice" aria-expanded="false">Generate Bulk Invoice</button>
+                        </form>
+                        <form action="." method="post" id="cases-bulk-invoice-mail" style="display: inline-block;">
+                            {% csrf_token %}
+                            <input type="hidden" name="context" value="print-bulk-invoice">
+                            <input type="hidden" name="from" value="{{ from }}">
+                            <input type="hidden" name="invoice-sending" value="mail">
+                            <input type="hidden" name="to" value="{{ to }}">
+                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                            <input type="hidden" name="case-ids" value="">
+                            <button class="btn btn-primary btn-sm generate-invoice-mail" id="send-email-bulk-invoice" type="submit" form="cases-bulk-invoice-mail" aria-expanded="false">Send Bulk Invoice</button>
+                        </form>
+                        <form action="." method="post" id="cases-aggregate-invoice" style="display: inline-block;">
+                            {% csrf_token %}
+                            <input type="hidden" name="context" value="print-aggregate-invoice">
+                            <input type="hidden" name="download" value="true">
+                            <input type="hidden" name="from" value="{{ from }}">
+                            <input type="hidden" name="invoice-sending" value="download">
+                            <input type="hidden" name="to" value="{{ to }}">
+                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                            <input type="hidden" name="case-ids" value="">
+                            <button class="btn btn-primary btn-sm generate-invoice" type="submit" form="cases-aggregate-invoice" aria-expanded="false">Generate Aggregate Invoice</button>
+                        </form>
+                        <form action="." method="post" id="cases-aggregate-invoice-mail" style="display: inline-block;">
+                            {% csrf_token %}
+                            <input type="hidden" name="context" value="print-aggregate-invoice">
+                            <input type="hidden" name="from" value="{{ from }}">
+                            <input type="hidden" name="invoice-sending" value="mail">
+                            <input type="hidden" name="to" value="{{ to }}">
+                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                            <input type="hidden" name="case-ids" value="">
+                            <button class="btn btn-primary btn-sm generate-invoice-mail" id="send-email-aggregate-invoice" type="submit" form="cases-aggregate-invoice-mail" aria-expanded="false">Send Aggregate Invoice</button>
+                        </form>
+
+                        <form action="." method="post" id="cases-combined-incoice-csv" style="display: inline-block;">
+                                {% csrf_token %}
+                                <input type="hidden" name="context" value="print-combined-invoice-as-csv">
+                                <input type="hidden" name="download" value="true">
+                                <input type="hidden" name="from" value="{{ from }}">
+                                <input type="hidden" name="invoice-sending" value="download">
+                                <input type="hidden" name="to" value="{{ to }}">
+                                <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                <input type="hidden" name="case-ids" value="">
+                                <button class="btn btn-primary btn-sm generate-invoice-csv"  type="submit" form="cases-combined-incoice-csv" aria-expanded="false">Generate Invoice as CSV</button>
+                            </form>
+                            <form action="." method="post" id="cases-combined-incoice-csv-mail" style="display: inline-block;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="context" value="print-combined-invoice-as-csv">
+                                    <!-- <input type="hidden" name="download" value="false"> -->
+                                    <input type="hidden" name="from" value="{{ from }}">
+                                    <input type="hidden" name="invoice-sending" value="mail">
+                                    <input type="hidden" name="to" value="{{ to }}">
+                                    <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                    <input type="hidden" name="case-ids" value="">
+                                    <button class="btn btn-primary btn-sm generate-invoice-csv-mail" id="send-email-combined-invoice-csv" type="submit" form="cases-combined-incoice-csv-mail" aria-expanded="false">Send Invoice as CSV</button>
+                                </form>
+                                <br><br>
+                                <form action="." method="post" id="cases-combined-incoice-excel" style="display: inline-block;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="context" value="print-combined-invoice-as-excel">
+                                        <input type="hidden" name="download" value="true">
+                                        <input type="hidden" name="from" value="{{ from }}">
+                                        <input type="hidden" name="invoice-sending" value="download">
+                                        <input type="hidden" name="to" value="{{ to }}">
+                                        <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                        <input type="hidden" name="case-ids" value="">
+                                        <button class="btn btn-primary btn-sm generate-invoice-excel"  type="submit" form="cases-combined-incoice-excel" aria-expanded="false">Generate Invoice as Excel</button>
+                                    </form>
+                                    <form action="." method="post" id="cases-combined-incoice-excel-mail" style="display: inline-block;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="context" value="print-combined-invoice-as-excel">
+                                            <!-- <input type="hidden" name="download" value="false"> -->
+                                            <input type="hidden" name="from" value="{{ from }}">
+                                            <input type="hidden" name="invoice-sending" value="mail">
+                                            <input type="hidden" name="to" value="{{ to }}">
+                                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                            <input type="hidden" name="case-ids" value="">
+                                            <button class="btn btn-primary btn-sm generate-invoice-excel-mail" id="send-email-combined-invoice-excel" type="submit" form="cases-combined-incoice-excel-mail" aria-expanded="false">Send Invoice as Excel</button>
+                                        </form>
+                    </div>
+                <div class="cases-for-firm">
+                    <br>
+                    <!-- <div style="z-index:100000000;display:none;" id="downloading-wait-div">
+                            Downloading ...
+                        </div>
+                    
+                    <br> -->
+                    <div class="selected-firm">
+                        Law firm: {{ selected_firm.name }}
+                    </div>
+                    <table class="table table-striped table-hover table-bordered" id="cases-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="square-green single-row" style="display: inline-block; width: 20px;">
+                                        <input id="select-all-cases" type="checkbox">
+                                    </div>
+                                </th>
+                                <th>Case Name</th>
+                                <th>DOL</th>
+                                <th>Closing date</th>
+                                <!-- <th>Invoice</th>
+                                <th>Invoice as Csv</th>
+                                <th>Invoice as Excel</th> -->
+                                <th> Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for case in cases %}
+                            <tr class="case-row" data-case-id="{{ case.pk }}">
+                                <td>
+                                   <div class="square-green single-row" style="display: inline-block; width: 20px;">
+                                    <input id="{{ case.pk }}" class="case-select-for-bulk-invoice" type="checkbox" value="{{ case.pk }}">
+                                    </div>
+                                </td>
+                                <td><a href="/administrator/case-details/{{ case.pk }}/">{{ case.name }}</a></td>
+                                <td>{{ case.dol | date:"D d M Y" }}</td>
+                                <td>{{ case.closing_date | date:"D d M Y" }}</td>
+                                <!-- <td>
+                                    <div class="btn-group">
+                                        {% if case.invoice %}
+                                        <form action="." method="post" id="case-invoice-{{ case.pk }}" style="display: inline-block;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="context" value="print-single-invoice">
+                                            <input type="hidden" name="download" value="true">
+                                            <input type="hidden" name="from" value="{{ from }}">
+                                            <input type="hidden" name="invoice-sending" value="download">
+                                            <input type="hidden" name="to" value="{{ to }}">
+                                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                            <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                            <button class="btn btn-primary btn-sm generate-invoice" type="submit" form="case-invoice-{{ case.pk }}" aria-expanded="false"><i class="fa fa-wp-forms"></i> Open Invoice</button>
+                                        </form>
+                                        <form action="." method="post" id="case-invoice-mail-{{ case.pk }}" style="display: inline-block;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="context" value="print-single-invoice">
+                                            <input type="hidden" name="from" value="{{ from }}">
+                                            <input type="hidden" name="invoice-sending" value="mail">
+                                            <input type="hidden" name="to" value="{{ to }}">
+                                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                            <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                            <button class="btn btn-primary btn-sm generate-invoice-mail" id="send-email-single-invoice-pdf" type="submit" case-id="{{ case.pk }}" form="case-invoice-mail-{{ case.pk }}" aria-expanded="false"><i class="fa fa-envelope-o"></i> Send</button>
+                                        </form>
+                                        <form action="." method="post" id="case-invoice-print-{{ case.pk }}" style="display: inline-block;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="context" value="print-single-invoice">
+                                                <input type="hidden" name="from" value="{{ from }}">
+                                                <input type="hidden" name="invoice-sending" value="print">
+                                                <input type="hidden" name="to" value="{{ to }}">
+                                                <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                                <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                                <button class="btn btn-primary btn-sm generate-invoice-print" formtarget="_blank" type = "submit" id="printing-single-invoice" form="case-invoice-print-{{ case.pk }}" case-id="{{ case.pk }}"aria-expanded="false"><i class="fa fa-print"></i> Print</button>
+                                            </form>
+                                        <button style="float:right;margin-left:100px;" class="btn btn-clear btn-sm delete-invoice" type="button" data-case-id="{{ case.pk }}"><i class="fa fa-trash-o"></i></button>
+                                        {% else %}
+                                        <form action="." method="post" id="case-invoice-{{ case.pk }}" style="display: inline-block;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="context" value="print-single-invoice">
+                                            <input type="hidden" name="download" value="false">
+                                            <input type="hidden" name="from" value="{{ from }}">
+                                            <input type="hidden" name="invoice-sending" value="download">
+                                            <input type="hidden" name="to" value="{{ to }}">
+                                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                            <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                            <button class="btn btn-primary btn-sm generate-invoice" type="submit" form="case-invoice-{{ case.pk }}" aria-expanded="false">Generate Invoice</button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+                                        </td>
+
+                                        <td>
+                                                <div class="btn-group">
+                                        {% if case.invoice_as_csv %}
+                                        
+                                            <form action="." method="post" id="case-invoice-csv-{{ case.pk }}" style="display: inline-block;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="context" value="print-single-invoice-csv">
+                                                    <input type="hidden" name="download" value="true">
+                                                    <input type="hidden" name="from" value="{{ from }}">
+                                                    <input type="hidden" name="invoice-sending" value="download">
+                                                    <input type="hidden" name="to" value="{{ to }}">
+                                                    <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                                    <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                                    <button class="btn btn-primary btn-sm generate-invoice-csv" type="submit" form="case-invoice-csv-{{ case.pk }}" aria-expanded="false">Open Invoice Csv</button>
+                                                </form>
+                                                <form action="." method="post" id="case-invoice-csv-mail-{{ case.pk }}" style="display: inline-block;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="context" value="print-single-invoice-csv">
+                                                        <input type="hidden" name="from" value="{{ from }}">
+                                                        <input type="hidden" name="invoice-sending" value="mail">
+                                                        <input type="hidden" name="to" value="{{ to }}">
+                                                        <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                                        <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                                        <button class="btn btn-primary btn-sm generate-invoice-csv-mail" type = "submit" id="send-email-single-invoice-csv" form="case-invoice-csv-mail-{{ case.pk }}" case-id="{{ case.pk }}"aria-expanded="false"><i class="fa fa-envelope-o"></i> Send</button>
+                                                    </form>
+                                                    <button style="float: right; margin-left: 100px" class="btn btn-clear btn-sm delete-invoice-csv" type="button" data-case-id="{{ case.pk }}"><i class="fa fa-trash-o"></i></button>
+                                            {% else %}
+                                                    
+                                                    <form action="." method="post" id="case-invoice-csv-{{ case.pk }}" style="display: inline-block;">
+                                                        {% csrf_token %}
+                                                        <input type="hidden" name="context" value="print-single-invoice-csv">
+                                                        <input type="hidden" name="download" value="false">
+                                                        <input type="hidden" name="from" value="{{ from }}">
+                                                        <input type="hidden" name="invoice-sending" value="download">
+                                                        <input type="hidden" name="to" value="{{ to }}">
+                                                        <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                                        <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                                        <button class="btn btn-primary btn-sm generate-invoice-csv" type="submit" form="case-invoice-csv-{{ case.pk }}" aria-expanded="false">Generate Invoice Csv</button>
+                                                    </form>
+                                            {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                        <div class="btn-group">
+                                {% if case.invoice_as_excel %}
+                                
+                                    <form action="." method="post" id="case-invoice-excel-{{ case.pk }}" style="display: inline-block;">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="context" value="print-single-invoice-excel">
+                                            <input type="hidden" name="download" value="true">
+                                            <input type="hidden" name="from" value="{{ from }}">
+                                            <input type="hidden" name="invoice-sending" value="download">
+                                            <input type="hidden" name="to" value="{{ to }}">
+                                            <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                            <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                            <button class="btn btn-primary btn-sm generate-invoice-excel" type="submit" form="case-invoice-excel-{{ case.pk }}" aria-expanded="false">Open Invoice Excel</button>
+                                        </form>
+                                        <form action="." method="post" id="case-invoice-excel-mail-{{ case.pk }}" style="display: inline-block;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="context" value="print-single-invoice-excel">
+                                                <input type="hidden" name="from" value="{{ from }}">
+                                                <input type="hidden" name="invoice-sending" value="mail">
+                                                <input type="hidden" name="to" value="{{ to }}">
+                                                <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                                <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                                <button class="btn btn-primary btn-sm generate-invoice-excel-mail" type = "submit" id="send-email-single-invoice-excel" form="case-invoice-excel-mail-{{ case.pk }}" case-id="{{ case.pk }}"aria-expanded="false"><i class="fa fa-envelope-o"></i> Send</button>
+                                            </form>
+                                            <button style="float: right; margin-left: 100px" class="btn btn-clear btn-sm delete-invoice-excel" type="button" data-case-id="{{ case.pk }}"><i class="fa fa-trash-o"></i></button>
+                                    {% else %}
+                                            
+                                            <form action="." method="post" id="case-invoice-excel-{{ case.pk }}" style="display: inline-block;">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="context" value="print-single-invoice-excel">
+                                                <input type="hidden" name="download" value="false">
+                                                <input type="hidden" name="from" value="{{ from }}">
+                                                <input type="hidden" name="invoice-sending" value="download">
+                                                <input type="hidden" name="to" value="{{ to }}">
+                                                <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                                <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                                <button class="btn btn-primary btn-sm generate-invoice-excel" type="submit" form="case-invoice-excel-{{ case.pk }}" aria-expanded="false">Generate Invoice excel</button>
+                                            </form>
+                                    {% endif %}
+                            </div>
+                        </td> -->
+                        <td>
+                                        <ul class="nav pull-left export-as">
+                                            <li class="dropdown">
+                                                <a data-toggle="dropdown" class="dropdown-toggle export-as" href="#" >
+                                            <span><i class="fa fa-share-square-o" aria-hidden="true"></i></span>
+                                            <b class="caret"></b>
+                                        </a>
+                                                <ul class="dropdown-menu extended export">
+                                                    <li><a class="generate-invoice-pdf" href="#" data-value="pdf" case-id="{{ case.pk }}">Generate as PDF</a></li>
+                                                    <li><a class="generate-invoice-excel" href="#"data-value="excel" case-id="{{ case.pk }}">Generate as Excel</a></li>
+                                                    <li><a class="generate-invoice-csv" href="#"data-value="csv" case-id="{{ case.pk }}">Generate as CSV</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                        <ul class="nav pull-left send-as">
+                                                <li class="dropdown">
+                                                    <a data-toggle="dropdown" class="dropdown-toggle export-as" href="#" >
+                                                <span><i class="fa fa-envelope-o"></i></span>
+                                                <b class="caret"></b>
+                                            </a>
+                                                    <ul class="dropdown-menu extended send">
+                                                        <li><a class="send-as-pdf" href="#" data-value="pdf" case-id="{{ case.pk }}"> Send as PDF</a></li>
+                                                        <li><a class="send-as-excel" href="#"data-value="csv" case-id="{{ case.pk }}">Send as Excel</a></li>
+                                                        <li><a class="send-as-csv" href="#"data-value="csv" case-id="{{ case.pk }}">Send as CSV</a></li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                            <form action="." method="post" id="case-invoice-print-{{ case.pk }}" style="display: inline-block;">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="context" value="print-single-invoice">
+                                                    <input type="hidden" name="from" value="{{ from }}">
+                                                    <input type="hidden" name="invoice-sending" value="print">
+                                                    <input type="hidden" name="to" value="{{ to }}">
+                                                    <input type="hidden" name="law-firm" value="{{ selected_firm.pk }}">
+                                                    <input type="hidden" name="case-id" value="{{ case.pk }}">
+                                                    <button style="margin-left:5px;"class="btn btn-primary btn-sm generate-invoice-print" formtarget="_blank" type = "submit" id="printing-single-invoice" form="case-invoice-print-{{ case.pk }}" case-id="{{ case.pk }}"aria-expanded="false"><i class="fa fa-print"></i></button>
+                                                </form>
+
+                                                {% if case.invoice or case.invoice_as_excel or case.invoice_as_csv  %}
+                                                <ul class="nav pull-left delete">
+                                                        <li class="dropdown">
+                                                            <a data-toggle="dropdown" class="dropdown-toggle delete" href="#" >
+                                                        <span><i class="fa fa-trash-o"></i></span>
+                                                        <b class="caret"></b>
+                                                    </a>
+                                                            <ul class="dropdown-menu extended export">
+                                                                {% if case.invoice %}
+                                                                <li><a class="delete-invoice" href="#" data-value="pdf" data-case-id="{{ case.pk }}">Delete PDF</a></li>
+                                                                {% endif %}
+                                                                {% if case.invoice_as_excel %}
+                                                                <li><a class="delete-invoice-excel" href="#"data-value="excel" data-case-id="{{ case.pk }}">Delete Excel</a></li>
+                                                                {% endif %}
+                                                                {% if case.invoice_as_csv %}
+                                                                <li><a class="delete-invoice-csv" href="#"data-value="csv" data-case-id="{{ case.pk }}">Delete CSV</a></li>
+                                                                {% endif %}
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                    {% endif %}
+                        </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        
+                    </table>
+                    <br>
+                    {% if not cases %}
+                    <span style="display: flex;align-items: center;justify-content: center;">
+                            <p> No data available </p>
+                        </span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </div>
+    <div class="modal fade" id="downloadingModal" role="dialog" style="margin-top:300px;text-align:center;align-items:center;">
+        <div class="modal-dialog" style="width:300px">
+            <div class="modal-content" style="text-align:center;margin-top:20px;margin-bottom:-10px">
+                    <div class="modal-header"></div>
+                <h4> Bulk Invoice is downloading</h4> <br><img style="width:50px;height:50px;"
+                    src="https://media.giphy.com/media/3ohhwMWP97pn8aJ8ic/giphy.gif"></img></div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+
+{% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-daterangepicker/moment.min.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+
+<script src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+<script src="{% static 'theme/js/advanced-form.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+{% endblock theme_scripts %}
+
+{% block other_scripts %}
+<script>
+    $('#navigation-button').remove();
+    $.validator.addMethod("greaterThan", function(value, element, params) {
+
+        if (!/Invalid|NaN/.test(new Date(value))) {
+            return new Date(value) > new Date($(params).val());
+        }
+
+        return isNaN(value) && isNaN($(params).val()) 
+            || (Number(value) > Number($(params).val())); 
+    },'Must be greater than From Date.');
+    
+    $.validator.addMethod('format', function (value, element) {
+       
+        if (value == '') {
+            return true;
+        }
+        return value.match(/^\d\d?\/\d\d?\/\d\d\d\d$/)
+    }, 'Please enter date in this format (mm-dd-yyyy)');
+
+   
+    $.validator.addMethod('minDate', function (value) {
+        
+         if (value == '') {
+             return true;
+         }
+         var inputDate = new Date(value);
+         year = inputDate.getYear()
+         if (year < 0)
+         {
+             return false;
+         }
+         else
+         {
+             return true;
+         }
+ 
+        
+     }, 'Please enter a valid date');
+  
+      $('form').validate({
+          rules: {
+              to: { greaterThan: "#from-date",
+                    format : true,
+                      minDate: true },
+                  
+              from :{
+                      format : true,
+                      minDate: true
+              }
+              },
+                 
+      });
+    $('a[data-nav-item=generate-invoice]').addClass('active');
+    
+    {% if selected_firm %}
+    $('.law-firm-select').val('{{ selected_firm.pk }}');
+     
+    $('input[type=text][name=from]').val('{{ from }}');
+    $('input[type=text][name=to]').val('{{ to }}');
+     
+    function reselect_bulk_cases() {
+        var case_rows = $('.case-row'), outer_loop, selected_cases = [], selected_case;
+        
+        selected_cases = [];
+     
+        for (outer_loop = 0; outer_loop < case_rows.size(); outer_loop += 1) {
+            selected_case = case_rows.eq(outer_loop);
+            if (selected_case.find('.icheckbox_square-green').hasClass('checked')) {
+                selected_cases.push(selected_case.attr('data-case-id'));
+            }
+        }
+
+        $('input[name="case-ids"]').val(JSON.stringify(selected_cases));
+        
+        if (selected_cases.length === 0) {
+            $('.bulk-buttons').addClass('hide');
+        } else {
+            $('.bulk-buttons').removeClass('hide');
+        }
+    }
+     
+    reselect_bulk_cases();
+     
+    setInterval(reselect_bulk_cases, 1000);
+    
+    {% endif %}
+         
+    $('.law-firm-select').select2({
+        width: '100%'
+    });
+     
+     $('.delete-invoice').click(function () {
+        //  debugger
+         var case_id = $(this).attr('data-case-id');
+         
+         $.post('/administrator/delete-case-invoice/', {
+             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+             case_id: case_id
+         }, function () {
+             location.reload();
+         });
+     });
+
+     $('.delete-invoice-csv').click(function () {
+        //  debugger
+         var case_id = $(this).attr('data-case-id');
+         
+         $.post('/administrator/delete-case-invoice-as-csv/', {
+             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+             case_id: case_id
+         }, function () {
+             location.reload();
+         });
+     });
+     $('.delete-invoice-excel').click(function () {
+        //  debugger
+         var case_id = $(this).attr('data-case-id');
+         
+         $.post('/administrator/delete-case-invoice-as-excel/', {
+             csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+             case_id: case_id
+         }, function () {
+             location.reload();
+         });
+     });
+     $('#cases-aggregate-invoice').click(function () {
+         setTimeout(function () {
+             location.reload();
+         }, 5000);
+     });
+     $('.generate-bulk-invoice').click(function (e) {
+        // setTimeout(function () {
+        //      location.reload();
+        //  }, 5000);
+        debugger
+        // form_data = $("#cases-bulk-invoice").serialize()
+        // var case_ids = $('input[name="case-ids"]').val();
+        // var csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val()
+        //  'use strict';
+        // e.preventDefault();
+        //     $.post(location.pathname, {
+        //         csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+        //         'context': 'print-bulk-invoice',
+        //         'invoice-sending':'download',
+        //         'download':'true',
+        //         'case-ids': case_ids,
+        //         'law-firm':'{{selected_firm.pk}}',
+        //         'from': $('#from-date').val(),
+        //         'to': $('#to-date').val(),
+        //     }, function (response, status, xhr) {
+        //         debugger
+        //         var filename = "";
+        //         var disposition = xhr.getResponseHeader('Content-Disposition');
+        //         if (disposition && disposition.indexOf('attachment') !== -1) {
+        //             var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+        //             var matches = filenameRegex.exec(disposition);
+        //             if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+        //         }
+        //         var type = xhr.getResponseHeader('Content-Type');
+        //         zip_file = 'data:application/zip;charset=utf-8,' + encodeURIComponent(response);
+        //         var blob=new File([response], filename ,{type: type});
+        //         var URL = window.URL || window.webkitURL;
+        //         var downloadUrl = URL.createObjectURL(blob);
+        //         var link=document.createElement('a');
+        //         link.href=downloadUrl
+        //         // console.log(link.href)
+        //         link.href = zip_file
+        //         link.download="all_invoices.zip";
+        //         link.click();
+                
+        //         setTimeout(function () {
+        //             location.reload();
+        //         }, 2000);
+        //         // setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100);
+        //     });
+        $("#downloadingModal").modal('show');
+        var xhr = new XMLHttpRequest();
+        url = location.pathname
+        params = $("#cases-bulk-invoice").serialize()
+        xhr.open('POST', url, true);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function () {
+            if (this.status === 200) {
+                var filename = "";
+                debugger
+                var disposition = xhr.getResponseHeader('Content-Disposition');
+                if (disposition && disposition.indexOf('attachment') !== -1) {
+                    var filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    var matches = filenameRegex.exec(disposition);
+                    if (matches != null && matches[1]) filename = matches[1].replace(/['"]/g, '');
+                }
+                var type = xhr.getResponseHeader('Content-Type');
+                filename = disposition.replace("filename=","");
+                var blob = typeof File === 'function'
+                    ? new File([this.response], filename, { type: type })
+                    : new Blob([this.response], { type: type });
+                if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                    // IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
+                    window.navigator.msSaveBlob(blob, filename);
+                } else {
+                    var URL = window.URL || window.webkitURL;
+                    var downloadUrl = URL.createObjectURL(blob);
+
+                    if (filename) {
+                        // use HTML5 a[download] attribute to specify filename
+                        var a = document.createElement("a");
+                        // safari doesn't support this yet
+                        if (typeof a.download === 'undefined') {
+                            window.location = downloadUrl;
+                        } else {
+                            a.href = downloadUrl;
+                            a.download = filename;
+                            document.body.appendChild(a);
+                            a.click();
+                        }
+                    } else {
+                        window.location = downloadUrl;
+                    }
+
+                    setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100); // cleanup
+                }
+            }       $("#downloadingModal").modal('hide');
+                    setTimeout(function () {
+                    location.reload();
+                }, 1000);
+        };
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.send(params);
+
+
+        
+     }); 
+    
+    $('.generate-invoice-print').click(function () {
+         setTimeout(function () {
+             location.reload();
+         }, 2000);
+     });
+     setTimeout(function () {
+         $('#select-all-cases + ins').click(function () {
+             if ($(this).parent().hasClass('checked')) {
+                 $('.case-row .icheckbox_square-green').addClass('checked');    
+             } else {
+                 $('.case-row .icheckbox_square-green').removeClass('checked');
+             }
+         });
+     }, 3000);
+
+    // Choose email swal to send email with invoice attached
+     $('#send-email-single-invoice-csv').click(function (e) {
+         debugger
+         var case_id = $(this).attr('case-id');
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-single-invoice-csv',
+                'invoice-sending':'mail',
+                'case-id': case_id,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+
+    $('#send-email-combined-invoice-csv').click(function (e) {
+         debugger
+         var case_ids = $('input[name="case-ids"]').val();
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-combined-invoice-as-csv',
+                'invoice-sending':'mail',
+                'case-ids': case_ids,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+
+    $('#send-email-single-invoice-pdf').click(function (e) {
+         debugger
+         var case_id = $(this).attr('case-id');
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-single-invoice',
+                'invoice-sending':'mail',
+                'case-id': case_id,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+    $('#send-email-bulk-invoice').click(function (e) {
+         debugger
+         var case_ids = $('input[name="case-ids"]').val();
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-bulk-invoice',
+                'invoice-sending':'mail',
+                'case-ids': case_ids,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+    $('#send-email-aggregate-invoice').click(function (e) {
+         debugger
+         var case_ids = $('input[name="case-ids"]').val();
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-aggregate-invoice',
+                'invoice-sending':'mail',
+                'case-ids': case_ids,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+    $('#send-email-single-invoice-excel').click(function (e) {
+         debugger
+         var case_id = $(this).attr('case-id');
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-single-invoice-excel',
+                'invoice-sending':'mail',
+                'case-id': case_id,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+    $('#send-email-combined-invoice-excel').click(function (e) {
+         debugger
+         var case_ids = $('input[name="case-ids"]').val();
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-combined-invoice-as-excel',
+                'invoice-sending':'mail',
+                'case-ids': case_ids,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+
+    $('.send-as-csv').click(function(e){
+        debugger
+         var case_id = $(this).attr('case-id');
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-single-invoice-csv',
+                'invoice-sending':'mail',
+                'case-id': case_id,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+    $('.send-as-pdf').click(function(e){
+        debugger
+         var case_id = $(this).attr('case-id');
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-single-invoice',
+                'invoice-sending':'mail',
+                'case-id': case_id,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+    $('.send-as-excel').click(function(e){
+        debugger
+         var case_id = $(this).attr('case-id');
+         'use strict';
+        e.preventDefault();
+        // debugger;
+        var selectedEmail='';
+        // var lawFirmEmails = JSON.parse('{"emails": {{law_firm_emails | safe}} }').emails;
+        swal({
+            title: 'Choose the email to send invoice',
+            type: 'question',
+            confirmButtonText: 'Send',
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            html:'<div class="swal2-radios" style="display: block;">\
+                <div class="send-invoice-email">\
+                    {% for email in law_firm_emails %}\
+                    <label>\
+                        <input type="radio" name="selected-law-firm-email" value="{{email | safe}}" {% if forloop.first %}checked="checked"{% endif %}>\
+                        <span>{{email | safe}}</span>\
+                    </label>\
+                    {% endfor %}\
+                </div>',
+                preConfirm: function() {
+                   return new Promise(function(resolve) {
+                        resolve([
+                            $('input[name="selected-law-firm-email"]:checked').val(),
+                         ]);
+                    });
+              }
+        }).then(function (result) {
+            debugger
+            $.post(location.pathname, {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                'context': 'print-single-invoice-excel',
+                'invoice-sending':'mail',
+                'case-id': case_id,
+                'law-firm':'{{selected_firm.pk}}',
+                'from': $('#from-date').val(),
+                'to': $('#to-date').val(),
+                'email': result[0]
+            }, function () {
+                swal({
+                    title: 'Success!',
+                    text: 'Invoice sent to Law Firm',
+                    type: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+                setTimeout(function () {
+                    location.reload();
+                }, 2000);
+            });
+        });
+    });
+    $('.generate-invoice-pdf').click(function(e){
+        var case_id = $(this).attr('case-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'print-single-invoice',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'invoice-sending',
+                'value':  'download',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'download',
+                'value':  'true',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'case-id',
+                'value': case_id,
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'law-firm',
+                'value': '{{selected_firm.pk}}',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'from',
+                'value': $('#from-date').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'to',
+                'value': $('#to-date').val(),
+                'type': 'hidden'
+            }))
+            .appendTo('body').submit();
+
+            setTimeout(function () {
+             location.reload();
+         }, 2000);
+    
+    })
+    $('.generate-invoice-excel').click(function(e){
+        var case_id = $(this).attr('case-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'print-single-invoice-excel',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'invoice-sending',
+                'value':  'download',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'download',
+                'value':  'true',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'case-id',
+                'value': case_id,
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'law-firm',
+                'value': '{{selected_firm.pk}}',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'from',
+                'value': $('#from-date').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'to',
+                'value': $('#to-date').val(),
+                'type': 'hidden'
+            }))
+            .appendTo('body').submit();
+            
+            setTimeout(function () {
+             location.reload();
+         }, 5000);
+    })
+    $('.generate-invoice-csv').click(function(e){
+        var case_id = $(this).attr('case-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'print-single-invoice-csv',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'invoice-sending',
+                'value':  'download',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'download',
+                'value':  'true',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'case-id',
+                'value': case_id,
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'law-firm',
+                'value': '{{selected_firm.pk}}',
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'from',
+                'value': $('#from-date').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'to',
+                'value': $('#to-date').val(),
+                'type': 'hidden'
+            }))
+            .appendTo('body').submit();
+
+            setTimeout(function () {
+             location.reload();
+         }, 5000);
+    })
+</script>
+{% endblock other_scripts %}

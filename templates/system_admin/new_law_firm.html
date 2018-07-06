@@ -1,0 +1,409 @@
+{% extends 'system_admin/base.html' %} {% load staticfiles %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" /> {% endblock theme_styles %} 
+
+{% block other_styles %}
+<link rel="stylesheet" href="{% static 'case_list/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'case_details/css/style.css' %}"> 
+<style>
+    .law-firm-select, .country-select-dropdown {
+        padding: 0;
+    }
+    
+    .law-firm-select > .select2-choice, .country-select-dropdown > .select2-choice {
+        height: 100%;
+    }
+    .btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+
+.add-file{
+    border-radius: 5px;
+}
+input[type=file]{
+    display: inline;
+}
+#upload-button{
+        display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    width: 100%;
+
+    }
+</style>
+{% endblock other_styles %} 
+
+{% load range_filter %} 
+
+{% block content %}
+
+<form action="." method="post" class="form-horizontal bucket-form" enctype="multipart/form-data">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Add Law Firm
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <br>
+                <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-6 col-lg-offset-3">
+                                <div class="col-lg-6">
+                                    <div class="input-group m-bot15" style="width: 100%;">
+                                        <input readonly type="text" class="form-control" value="Username: Same as email ID" style="border: 1px solid rgb(226, 226, 228);">
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="input-group m-bot15" style="width: 100%;">
+                                        <input required type="password" name="password" class="form-control" placeholder="Password">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div class="panel-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Referring Law Firm</div>
+                        <div class="col-lg-6">
+                            <select name="referring-law-firm" id="" class="form-control mbot-15 law-firm-select" data-placeholder="Select a referring law firm">
+                                <option></option>
+                                {% for law_firm in law_firms %}
+                                <option value="{{ law_firm.pk }}">{{ law_firm.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Name of Law Firm <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input name="name" type="text" class="form-control" required minlength="1">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 1 <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="phone-1" type="text" min="0" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Phone number 2</div>
+                        <div class="col-lg-6">
+                            <input name="phone-2" type="text" min="0" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 1 <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="email-1" type="email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Email ID 2</div>
+                        <div class="col-lg-6">
+                            <input name="email-2" type="email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Payment Plan</div>
+                            <div class="col-sm-6">
+                                <select class="form-control" name="payment-plan" class="form-control mbot-15 payment-plan">
+                                    <option name="daily" value="daily">Daily</option>
+                                    <option name="monthly" value="monthly">Monthly</option>
+                                </select>
+                            </div>      
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1 <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="street-1" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="street-2" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="city" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State/Province/Region <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="state" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Country <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <select name="country" required class="form-control mbot-15 country-select-dropdown">
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="zip-code" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                                <div class="col-xs-6 col-sm-3 control-label col-lg-3">Upload Documents</div>
+                                    <div class="col-xs-6 col-lg-6 button-container">
+                                            <!-- <span class="btn btn-default btn-file">
+                                            +Add Files<input type="file" id="files1" name="document" accept=".pdf, .docx, .doc, .txt" multiple required/>
+                                        </span>
+                                            <br><br>
+                                            <ul class="fileList"></ul> -->
+                                    </div>
+                        </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel rates-panel">
+                <header class="panel-heading">
+                    Rates
+                    <span class="tools pull-right">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                {% include 'system_admin/law_firm_rates_snippet.html' %}
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-buttons editing">
+                <input type="submit" class="btn btn-info" value="Create">
+            </div>
+        </div>
+    </div>
+
+</form>
+
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+<script src="{% static 'common/js/jquery.inputmask.bundle.min.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+    $('a[data-nav-item=law-firms]').addClass('active');
+    $('#navigation-button').html('<i class="fa fa-chevron-left"></i> Back');
+    $('#navigation-button').click(function () {
+        location.assign('/administrator/law-firms/');
+    });
+    
+    $.validator.addMethod('phone', function (value) {
+        if (value == '') {
+            return true;
+        }
+        
+        return /^\+\d \d\d\d\-\d\d\d\-\d\d\d\d$/.test(value); 
+    }, 'Please enter a valid phone number.');
+    
+    $('form').validate({
+        rules: {
+            'email-1': {
+                remote: {
+                    url: '/check-username/'
+                }
+            },
+            'phone-1': {
+                phone: true
+            },
+            'phone-2': {
+                phone: true
+            }
+        },
+        messages: {
+            'email-1': {
+                remote: 'A user with this email already exists'
+            }
+        }
+
+    });
+    
+    $('input[name*=phone]').inputmask('+9 999-999-9999');
+         
+    $('.law-firm-select').select2({
+        width: '100%'
+    });
+         
+    $('.country-select-dropdown').select2({
+        width: '100%'
+    });
+
+
+
+    // $.fn.fileUploader = function (filesToUpload) {
+    //     this.closest(".files").change(function (evt) {
+
+    //     for (var i = 0; i < evt.target.files.length; i++) {
+    //         filesToUpload.push(evt.target.files[i]);
+    //     };
+    //     var output = [];
+
+    //     for (var i = 0, f; f = evt.target.files[i]; i++) {
+    //         var removeLink = "<a class=\"removeFile\" href=\"#\" data-fileid=\"" + i + "\"><i class='fa fa-times-circle' aria-hidden='true'></i></a>";
+
+    //         output.push("<li style='width: max-content;'><strong>", f.name, "</strong> - ",
+    //             f.size, " bytes. &nbsp; &nbsp; ", removeLink, "</li> ");
+    //     }
+
+    //             $(this).children(".fileList")
+    //                 .append(output.join(""));
+    //         });
+    //     };
+
+    //     var filesToUpload = [];
+
+    //     $(document).on("click",".removeFile", function(e){
+    //         e.preventDefault();
+    //         var fileName = $(this).parent().children("strong").text();
+            
+    //         for(i = 0; i < filesToUpload.length; ++ i){
+    //             if(filesToUpload[i].name == fileName){
+            
+    //                 filesToUpload.splice(i, 1);
+    //             }	
+    //         }
+    //         $(this).parent().remove();
+    //     });
+
+
+    //         $("#files1").fileUploader(filesToUpload);
+            
+    
+
+
+
+            (function(){
+        
+            var form = $('.button-container');
+            fileSerialNumber = 1;
+            var addFileInputBtn = $('<button class="add-file">Add file</button>')
+        
+            form.append(addFileInputBtn);
+        
+        
+            addFileInputBtn.click(function(event){
+              event.preventDefault();
+              addFileInputBtn.text("+Add anoother file")
+              var fileBoxContainer = $('<div class="fileBoxContainer"/>')
+              var fileNameLabel = $('<label for="namefile'+fileSerialNumber+'"style="margin-left: 40px;"> Name: </label>');
+              var fileName = $('<input name="document-name" type="text" style="border-radius:3px;border:1px solid #e2e2e4;"></input>');
+              var rmButton = $('<button style="background:transparent;border:none;"><i class="fa fa-times-circle" aria-hidden="true"></button>');
+              var fileInput = $('<input name="document" type="file"></input>')
+            //   var fileInputSpan = $('<span class="btn btn-default btn-file">Choose</span>')
+            //   fileInputSpan.append(fileInput)
+              fileBoxContainer.append(fileInput);
+              fileBoxContainer.append(fileNameLabel);
+              fileBoxContainer.append(fileName);
+              fileBoxContainer.append(rmButton);
+              form.append(fileBoxContainer);
+              
+              fileInput.on('change',function () {
+              var fName= this.value
+              fName = fName.replace(/.*[\/\\]/, '');
+              fName = fName.substring(fName.lastIndexOf('/')+1, fName.lastIndexOf('.'));
+              fileName.val(fName);
+                }
+              ) ;
+              
+              rmButton.click(function(event){
+                event.preventDefault();
+                fileBoxContainer.remove();
+              });
+              
+              
+            fileSerialNumber+=1;
+            });
+          }
+        )()
+
+
+</script>
+{% endblock other_scripts %}

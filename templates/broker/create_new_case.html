@@ -1,0 +1,830 @@
+{% extends 'broker/base.html' %} {% load staticfiles %} {% block theme_styles %}
+<link href="{% static 'theme/bs3/css/bootstrap.min.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/bootstrap-reset.css' %}" rel="stylesheet">
+<link href="{% static 'theme/font-awesome/css/font-awesome.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/iCheck/skins/minimal/minimal.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/minimal/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/square/square.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/square/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/iCheck/skins/flat/grey.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/red.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/green.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/blue.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/yellow.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/iCheck/skins/flat/purple.css' %}" rel="stylesheet">
+
+<link href="{% static 'theme/js/bootstrap-datepicker/css/datepicker.css' %}" rel="stylesheet">
+<link href="{% static 'theme/js/bootstrap-daterangepicker/daterangepicker-bs3.css' %}" rel="stylesheet">
+
+
+<link rel="stylesheet" type="text/css" href="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.css' %}" />
+
+<!-- Custom styles for this template -->
+<link href="{% static 'theme/css/style.css' %}" rel="stylesheet">
+<link href="{% static 'theme/css/style-responsive.css' %}" rel="stylesheet" />
+
+<link href="{% static 'theme/js/select2/select2.css' %}" rel="stylesheet" /> {% endblock theme_styles %} {% block other_styles %}
+<link rel="stylesheet" href="{% static 'new_case/css/style.css' %}">
+<style>
+    .law-firm-select,
+    .country-select-dropdown {
+        padding: 0;
+    }
+
+    .law-firm-select>.select2-choice,
+    .country-select-dropdown>.select2-choice {
+        height: 100%;
+    }
+
+    .language-select {
+        padding: 0;
+    }
+
+    .language-select>.select2-choice {
+        height: 100%;
+    }
+
+    .client-button {
+        color: #888888;
+    }
+
+    .form-row {
+        margin-bottom: 10px;
+    }
+
+    .popup-form-data .label {
+        font-weight: bold;
+        display: inline-block;
+        vertical-align: middle;
+        width: 45%;
+        color: rgb(84, 84, 84);
+        text-align: left;
+    }
+
+    .popup-form-data .value {
+        display: inline-block;
+        vertical-align: middle;
+        width: 50%;
+        color: rgb(84, 84, 84);
+        text-align: left;
+    }
+    .locality-select{
+        padding: 0;   
+    }
+    .locality-select > .select2-choice {
+        height: 100%;
+    }
+</style>
+{% endblock other_styles %} {% load range_filter %} {% block content %}
+
+<form action="." id="new-case" method="post" class="form-horizontal bucket-form" enctype="multipart/form-data">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    New Case
+                    <span class="tools pull-right" style="pointer-events: none;">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Case name <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="case-name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Law Firm <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <select name="law-firm" required id="" class="form-control mbot-15 law-firm-select">
+                                <option value=""></option>
+                                {% for law_firm in law_firms %}
+                                <option value="{{ law_firm.pk }}">{{ law_firm.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Case type <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <select name="case-type" id="case-type" class="form-control mbot-15">
+                                <option value="Auto V. Auto">Auto V. Auto</option>
+                                <option value="Auto V. Pedestrian">Auto V. Pedestrian</option>
+                                <option value="Auto V. Bicycle">Auto V. Bicycle</option>
+                                <option value="Premises Liability">Premises Liability</option>
+                                <option value="Dog Bite">Dog Bite</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Explain if case type is Others</div>
+                            <div class="col-lg-6">
+                                <input type="text" disabled="disabled" name="case-type-description" id="case-type-description" class="form-control mbot-15"
+                                    maxlength="200" placeholder=""></input>
+                            </div>
+                        </div>
+                    <div class="form-group">
+                            <div class="col-sm-3 control-label col-lg-3">Locality <sup>*</sup></div>
+                            <div class="col-lg-6">
+                                <select required name="locality" id="" class="form-control mbot-15 locality-select">
+                                        <option value=""></option>
+                                    <option value="In Area">In Area</option>
+                                    <option value="Out of Area">Out of Area</option>
+                                </select>
+                            </div>
+                        </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Adult clients</div>
+                        <div class="col-lg-6">
+                            <input id="adult-clients" type="text" name="adult-clients" class="form-control tags">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Child clients</div>
+                        <div class="col-lg-6">
+                            <input id="child-clients" type="text" name="child-clients" class="form-control tags">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">No. of adult signatures required <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="number" min="0" value="0" name="number-of-adult-signatures-required" class="form-control">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">No. of child signatures required <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="number" min="0" value=0 name="number-of-child-signatures-required" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Total pages in attachment </div>
+                        <div class="col-lg-6">
+                            <input type="number" min="0" name="total-pages-in-attachment" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Date of Loss of insurance (DOL)</div>
+                        <div class="col-lg-6">
+                            <input class="form-control form-control-inline input-medium default-date-picker" size="16" type="text" value="" id="dol"
+                                name="dol">
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Expected Date of Closing</div>
+                        <div class="col-lg-6">
+                            <input class="form-control form-control-inline input-medium default-date-picker" size="16" type="text" value="" id="edos"
+                                name="edos">
+
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Expected payment for case <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="number" min="0" name="expected-payment-for-case" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <!--
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Documents to sign</div>
+                        <div class="col-lg-6">
+                            <input name="documents" type="file" id="exampleInputFile">
+                            <p class="help-block">Please upload the compressed zip file of all documents needed</p>
+                        </div>
+                    </div>
+-->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Client information
+                    <span class="tools pull-right" style="pointer-events: none;">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Name <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required type="text" name="client-name" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Mobile Phone <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <input required name="mobile-phone" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Home Phone</div>
+                        <div class="col-lg-6">
+                            <input name="home-phone" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Primary Email </div>
+                        <div class="col-lg-6">
+                            <input name="primary-email" type="email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Secondary Email</div>
+                        <div class="col-lg-6">
+                            <input name="secondary-email" type="email" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label col-lg-3">Language <sup>*</sup></div>
+                        <div class="col-lg-6">
+                            <select name="language" required id="" class="form-control mbot-15 language-select">
+                                {% for language in languages %}
+                                <option value="{{ language }}">{{ language }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 1 <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="street-1" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Address line 2</div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="street-2" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">City <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="city" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">State/Province/Region <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input required name="state" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">Country <sup>*</sup></div>
+                        <div class="col-xs-6 col-lg-6">
+                            <select name="country" required id="" class="form-control mbot-15 country-select-dropdown">
+                                {% for country in countries %}
+                                <option value="{{ country }}">{{ country }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-6 col-sm-3 control-label col-lg-3">ZIP code </div>
+                        <div class="col-xs-6 col-lg-6">
+                            <input name="zip-code" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <div class="col-xs-6 col-sm-3 control-label col-lg-3">Attach Documents </div>
+                            <div class="col-xs-6 col-lg-6 attach-documents" >
+                              
+                            </div>
+                        </div>
+                    <!-- <div class="form-group">
+                            
+                            <div class="col-xs-12 col-lg-12 attach-documents" >
+                            <input style="margin-left:290px" type="checkbox" name="combine-documents" value = "combine"> Combine all the documents to one document which will be sent to investigator </input>
+
+                            </div>
+                        </div> -->
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    Case status
+                    <span class="tools pull-right" style="pointer-events: none;">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <div class="col-md-9">
+                        <div class="case-status-display">Status: <span class="status-text">No investigator assigned</span></div>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="hidden" name="investigator">
+                        <input type="hidden" name="status" value="Inactive">
+                        <button type="button" class="btn btn-primary btn-lg btn-block assign-investigator">Assign Investigator</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <section class="panel">
+                <header class="panel-heading">
+                    Rates for law firm
+                    <span class="tools pull-right" style="pointer-events: none;">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Basic fee for case</label>
+                            <input type="number" min="0" required name="basic-fee-for-case-law-firm" class="form-control" placeholder="Enter rate">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">No. of free miles</label>
+                            <input type="number" min="0" required name="no-of-free-miles-law-firm" class="form-control" placeholder="Enter rate">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Mileage rate</label>
+                            <input type="number" min="0" required name="mileage-rate-law-firm" class="form-control" placeholder="Enter rate">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        <div class="col-sm-6">
+            <section class="panel">
+                <header class="panel-heading">
+                    Rates for investigators
+                    <span class="tools pull-right" style="pointer-events: none;">
+                        <a href="javascript:;" class="fa fa-chevron-down"></a>
+                     </span>
+                </header>
+                <div class="panel-body">
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Basic fee for case</label>
+                            <input type="number" min="0" required name="basic-fee-for-case-investigator" class="form-control" placeholder="Enter rate">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">No. of free miles</label>
+                            <input type="number" min="0" required name="no-of-free-miles-investigator" class="form-control" placeholder="Enter rate">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Mileage rate</label>
+                            <input type="number" min="0" required name="mileage-rate-investigator" class="form-control" placeholder="Enter rate">
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-buttons">
+                <button type="button" class="btn btn-info create-case">Create</button>
+                <button type="submit" style="display: none;"></button>
+            </div>
+        </div>
+    </div>
+
+</form>
+{% endblock content %} {% block theme_scripts %}
+<script src="{% static 'theme/js/jquery.js' %}"></script>
+<script src="{% static 'theme/bs3/js/bootstrap.min.js' %}"></script>
+<script src="{% static 'theme/js/jquery.dcjqaccordion.2.7.js' %}" class="include"></script>
+<script src="{% static 'theme/js/jquery.scrollTo.min.js' %}"></script>
+<script src="{% static 'theme/js/jQuery-slimScroll-1.3.0/jquery.slimscroll.js' %}"></script>
+<script src="{% static 'theme/js/jquery.nicescroll.js' %}"></script>
+<!--Easy Pie Chart-->
+<script src="{% static 'theme/js/easypiechart/jquery.easypiechart.js' %}"></script>
+<!--Sparkline Chart-->
+<script src="{% static 'theme/js/sparkline/jquery.sparkline.js' %}"></script>
+<!--jQuery Flot Chart-->
+<script src="{% static 'theme/js/flot-chart/jquery.flot.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.tooltip.min.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.resize.js' %}"></script>
+<script src="{% static 'theme/js/flot-chart/jquery.flot.pie.resize.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/data-tables/jquery.dataTables.js' %}"></script>
+<script type="text/javascript" src="{% static 'theme/js/data-tables/DT_bootstrap.js' %}"></script>
+
+<script src="{% static 'theme/js/iCheck/jquery.icheck.js' %}"></script>
+
+<script src="{% static 'theme/js/jquery-tags-input/jquery.tagsinput.js' %}"></script>
+
+<script type="text/javascript" src="{% static 'theme/js/ckeditor/ckeditor.js' %}"></script>
+
+<script src="{% static 'theme/js/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
+<script src="{% static 'theme/js/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js' %}"></script>
+
+<!--common script init for all pages-->
+<script src="{% static 'theme/js/scripts.js' %}"></script>
+<script src="{% static 'theme/js/icheck-init.js' %}"></script>
+<script src="{% static 'theme/js/jquery.validate.min.js' %}"></script>
+
+<script src="{% static 'theme/js/table-editable.js' %}"></script>
+<script src="{% static 'theme/js/table-editable1.js' %}"></script>
+<script src="{% static 'theme/js/select2/select2.js' %}"></script>
+<script src="{% static 'common/js/jquery.inputmask.bundle.min.js' %}"></script>
+{% endblock theme_scripts %} {% block other_scripts %}
+<script>
+    var investigator_assigned = false, assign_investigator, show_investigator, basic_law_firm_in_area, basic_law_firm_out_of_area, basic_investigator_in_area, basic_investigator_out_of_area;
+
+    $.validator.addMethod('phone', function (value) {
+        if (value == '') {
+            return true;
+        }
+
+        return /^\+\d \d\d\d\-\d\d\d\-\d\d\d\d$/.test(value);
+    }, 'Please enter a valid phone number.');
+
+    $('#adult-clients').tagsInput({
+        width: 'auto',
+        defaultText: 'Add client'
+    });
+    $('#child-clients').tagsInput({
+        width: 'auto',
+        defaultText: 'Add client'
+    });
+    $.validator.addMethod('format', function (value, element) {
+
+        if (value == '') {
+            return true;
+        }
+        return value.match(/^\d\d?\/\d\d?\/\d\d\d\d$/)
+    }, 'Please enter date in this format (mm-dd-yyyy)');
+    $.validator.addMethod('minDate', function (value) {
+
+        if (value == '') {
+            return true;
+        }
+        var inputDate = new Date(value);
+        year = inputDate.getYear()
+        if (year < 0) {
+            return false;
+        }
+        else {
+            return true;
+        }
+
+
+    }, 'Please enter a valid date');
+    $('#dol').datepicker({ autoclose: true });
+    $('#edos').datepicker({ autoclose: true });
+
+    $('form').validate({
+        rules: {
+            'mobile-phone': {
+                phone: true
+            },
+            'home-phone': {
+                phone: true
+            },
+            'dol': {
+                format: true,
+                minDate: true
+
+            },
+            'edos': {
+                format: true,
+                minDate: true
+
+            }
+        }
+    });
+
+    $('#case-type').on('change', function (event) {
+        if ($('#case-type').val() != 'Others') {
+            $('#case-type-description').attr('disabled', 'disabled').attr('required', false).val('').attr('placeholder', '');
+
+        } else {
+            $('#case-type-description').attr('disabled', false).attr('required', true).attr('placeholder', 'Max. 200 chars');
+        }
+    })
+
+    $('input[name*=phone]').inputmask('+9 999-999-9999');
+
+    $('a[data-nav-item=create-new-case]').addClass('active');
+    $('#navigation-button').text('All Cases');
+    $('#navigation-button').click(function () {
+        location.assign('/broker/all-cases/');
+    });
+
+    $('.country-select-dropdown').select2({
+        width: '100%'
+    });
+    $('.locality-select').select2({
+        width: '100%'
+    });
+
+    assign_investigator = function () {
+        var html_text = '<div class="editable-table">\
+        <table class="table table-striped table-hover table-bordered" id="cases-table-1">\
+            <thead>\
+            <tr>\
+                <th class=""></th>\
+                <th class="no-sort">Name</th>\
+                <th class="no-sort">Location</th>\
+                <th class="no-sort">Languages known</th>\
+                <th class="no-sort">Last active</th>\
+                <th class="no-sort">No. of cases</th>\
+                <th>Rating</th>\
+                <th class="no-sort" style="width: 140px;">Status</th>\
+            </tr>\
+            </thead>\
+            <tbody>';
+
+        {% for investigator in investigators %}
+        
+        html_text += '<tr>\
+            <td><div class="square-green single-row">\
+                <input id="{{ investigator.pk }}" type="radio"  name="assign-investigator" value="{{ investigator.pk }}">\
+            </div></td>\
+            <td><div class="investigator-name" data-investigator-id="{{ investigator.pk }}">{{ investigator.user.first_name }} {{ investigator.user.last_name }}</div></td>\
+            <td class="table-dropdown-holder">\
+                {% if investigator.address.gmaps_link %}\
+                <span class="options"><a href="{{ investigator.address.gmaps_link | safe }}" target="_blank"><i class="fa fa-map-marker"></i></a></span>\
+                {% else %}\
+                <span class="options">\
+                    <i class="fa fa-map-marker"></i>\
+                </span>\
+                {% endif %}\
+            </td>\
+            <td>{{ investigator.languages | join:"," }}</td>\
+            <td>{{ investigator.user.last_login|date:"D d F Y  h:i A" }}</td>\
+            <td>{{ investigator.cases_in_month }}</td>\
+            <td>{{ investigator.rating }}</td>\
+            <td>{% if investigator.is_active %}Active{% else %}Suspended{% endif %}</td>\
+        </tr>';
+
+        {% endfor %}
+                
+        html_text += '</tbody></table></div>';
+
+        swal({
+            title: 'Assign an Investigator',
+            html: html_text,
+            customClass: 'investigator-table-holder',
+            confirmButtonText: 'Assign',
+            showCancelButton: true,
+            preConfirm: function () {
+                return new Promise(function (resolve, reject) {
+                    var investigator_data = {
+                        id: '',
+                        name: ''
+                    };
+                    if ($('input[type=radio][name=assign-investigator]:checked').size() > 0) {
+                        investigator_data.id = $('input[type=radio][name=assign-investigator]:checked').val();
+                        investigator_data.name = $('.investigator-name[data-investigator-id="' + investigator_data.id + '"]').text();
+                        resolve(investigator_data);
+                    } else {
+                        reject('You need to select an investigator');
+                    }
+                });
+            }
+        }).then(function (investigator_data) {
+            $('input[name=investigator]').val(investigator_data.id);
+            $('input[name=status]').val('Inactive');
+            $('.status-text').text('Investigator assigned (' + investigator_data.name + ')');
+            $('button.assign-investigator').text('Reassign Investigator');
+            investigator_assigned = true;
+
+            $.post('/broker/get-investigator-rates/', {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                id: investigator_data.id
+            }, function (returned_data) {
+                if ($('select[name=locality]').val() == 'In Area') {
+                    $('input[name=basic-fee-for-case-investigator]').val(returned_data['basic_in_area']);
+                } else {
+                    $('input[name=basic-fee-for-case-investigator]').val(returned_data['basic_out_of_area']);
+                }
+
+                basic_investigator_in_area = returned_data['basic_in_area'];
+                basic_investigator_out_of_area = returned_data['basic_out_of_area'];
+
+                $('input[name=no-of-free-miles-investigator]').val(returned_data['free_miles'])
+                $('input[name=mileage-rate-investigator]').val(returned_data['mileage_rate'])
+
+            });
+
+            swal({
+                title: 'Investigator assigned',
+                text: 'The investigator has been assigned successfully',
+                type: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }).catch(swal.noop);
+
+        $('.investigator-name').click(function () {
+            show_investigator($(this).attr('data-investigator-id'));
+        });
+
+        $('.square-green input').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+            increaseArea: '20%' // optional
+        });
+        $('.select2-filter').select2({
+            width: '90%'
+        });
+        EditableTable1.init();
+    };
+
+    show_investigator = function (investigator_id) {
+        'use strict';
+
+        $.post('/broker/show-investigator-details/', {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            investigator_id: investigator_id
+        }, function (returned_data) {
+            swal({
+                title: 'Investigator details',
+                customClass: 'popup-form-data',
+                html: returned_data
+            }).then(assign_investigator);
+        });
+
+    }
+
+    $('.assign-investigator').on('click', assign_investigator);
+
+    $('.create-case').click(function () {
+        debugger
+        if (investigator_assigned) {
+            $('#new-case').submit();
+            var isOnIOS = navigator.userAgent.match(/iPad/i)|| navigator.userAgent.match(/iPhone/i);
+            var eventName = isOnIOS ? "pagehide" : "beforeunload";
+            
+            window.addEventListener(eventName, function () {
+                $(".create-case").text("Please Wait..").attr("disabled", "disabled");
+            });
+        } else {
+            swal({
+                title: 'Investigator not assigned',
+                text: 'Are you sure that you do not want an investigator assigned?',
+                type: 'question',
+                showCancelButton: true
+            }).then(function () {
+                // debugger
+                $('#new-case').submit();
+                var isOnIOS = navigator.userAgent.match(/iPad/i)|| navigator.userAgent.match(/iPhone/i);
+            var eventName = isOnIOS ? "pagehide" : "beforeunload";
+            
+            window.addEventListener(eventName, function () {
+                $(".create-case").text("Please Wait..").attr("disabled", "disabled");
+            });
+            })
+        }
+    });
+
+
+
+
+    $('.client-button').click(function () {
+        swal({
+            title: 'Client Information',
+            customClass: 'popup-form-data',
+            html: '<div class="form-row"><div class="label">Name</div><div class="value">Value</div></div>\
+                    <div class="form-row"><div class="label">Mobile</div><div class="value">+14155552671</div></div>\
+                    <div class="form-row"><div class="label">Home phone</div><div class="value">+1-541-754-3010</div></div>\
+                    <div class="form-row"><div class="label">Email address (primary)</div><div class="value">email.address@hostspace.com</div></div>\
+                    <div class="form-row"><div class="label">Email address (secondary)</div><div class="value">email.address@hostspace.com</div></div>\
+                    <div class="form-row"><div class="label">Client Language</div><div class="value">Language</div></div>\
+                    <div class="form-row"><div class="label">Address line 1</div><div class="value">Address line 1</div></div>\
+                    <div class="form-row"><div class="label">Address line 2</div><div class="value">Address line 2</div></div>\
+                    <div class="form-row"><div class="label">City</div><div class="value">City</div></div>\
+                    <div class="form-row"><div class="label">State</div><div class="value">State</div></div>\
+                    <div class="form-row"><div class="label">ZIP code</div><div class="value">ZIP code</div></div>'
+        })
+    });
+
+    $('.new-client-button').click(function () {
+        swal({
+            title: 'New client',
+            customClass: 'popup-form-data',
+            html: '<div class="form-row"><div class="label">Name</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">Mobile</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">Home phone</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">Email address (primary)</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">Email address (secondary)</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">Client Language</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">Address line 1</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">Address line 2</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">City</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">State</div><div class="value"><input></div></div>\
+                    <div class="form-row"><div class="label">ZIP code</div><div class="value"><input></div></div>'
+        }).then(function () {
+            swal('Client added successfully', 'The client has been added to this case', 'success');
+        });
+    });
+
+    $('.law-firm-select').select2({
+        width: '100%'
+    });
+    
+    $('.law-firm-select').change(function () {
+    //   debugger
+        var  law_firm_id = $(this).val();
+
+        $.post('/broker/get-law-firm-rates/', {
+            csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+            id: law_firm_id
+        }, function (returned_data) {
+            if ($('select[name=locality]').val() == 'In Area') {
+                $('input[name=basic-fee-for-case-law-firm]').val(returned_data['basic_in_area']);
+            } else {
+                $('input[name=basic-fee-for-case-law-firm]').val(returned_data['basic_out_of_area']);
+            }
+
+            basic_law_firm_in_area = returned_data['basic_in_area'];
+            basic_law_firm_out_of_area = returned_data['basic_out_of_area'];
+
+            $('input[name=no-of-free-miles-law-firm]').val(returned_data['free_miles'])
+            $('input[name=mileage-rate-law-firm]').val(returned_data['mileage_rate'])
+            
+            checkboxList = $('<span></span>')
+            checkbox = null
+            {% for document in documents %}
+            
+            
+            if ( {{document.law_firm.pk}} == law_firm_id )
+            {
+            checkbox = $('<input type="checkbox" name="document" value={{document.pk}}> {{document.file_name}}</input><button class="btn btn-clear btn-sm download-document" type="button" style="margin-left:10px;background: lightgray;    margin-top: -5px;float:right;" href="#" document-id="{{ document.pk }}"><i class="fa fa-download" aria-hidden="true"></i></button><br><br>')
+            checkboxList.append(checkbox)
+            // $('.attach-documents').append(checkbox)
+            }
+            
+            {% endfor %}
+            $('.attach-documents').html(checkboxList)
+                // checkbox = $('<input type="checkbox" name="document" value="'+ returned_data['documents'] +'"/>')
+               
+                $('.download-document').click(function () {
+        //  debugger
+        var document_id = $(this).attr('document-id');
+        $('<form action="." method="POST"></form>')
+            .append($('<input>', {
+                'name': 'csrfmiddlewaretoken',
+                'value': $('input[name=csrfmiddlewaretoken]').val(),
+                'type': 'hidden'
+            }))
+            .append($('<input>', {
+                'name': 'context',
+                'value':  'download-document',
+                'type': 'hidden'
+            })).append($('<input>', {
+                'name': 'document-id',
+                'value': document_id,
+                'type': 'hidden'
+            })).appendTo('body').submit();
+     })
+        });
+    });
+
+    $('select[name=locality]').change(function () {
+        if ($(this).val() === 'In Area') {
+            $('input[name=basic-fee-for-case-law-firm]').val(basic_law_firm_in_area);
+            $('input[name=basic-fee-for-case-investigator]').val(basic_investigator_in_area);
+        } else {
+            $('input[name=basic-fee-for-case-law-firm]').val(basic_law_firm_out_of_area);
+            $('input[name=basic-fee-for-case-investigator]').val(basic_investigator_out_of_area);
+        }
+    });
+
+    $('.language-select').select2({
+        width: '100%'
+    });
+
+    $('input[name=case-name]').keyup(function(){
+    $("input[name=client-name]").val(this.value);
+})
+
+</script>
+{% endblock other_scripts %}
